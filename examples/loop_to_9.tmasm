@@ -1,0 +1,25 @@
+entry:
+loop:
+	; convert the number to ascii (1 digit only, it breaks with more digits)
+	move  &R6 &R5
+	add   &R6 '0'
+	push8 &R6
+	push8 10
+
+	; output the char
+	move &R1 0
+	move &R2 1
+	move &R3 2
+	move &R4 1
+
+	writef
+	move &SP 0
+
+	; increment the loop
+	inc &R5
+
+	lt    &R5 10
+	jumpt loop ; if R1 is less than 10, jump to loop
+	; else continue to the exit
+
+	halt

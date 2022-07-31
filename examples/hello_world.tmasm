@@ -1,0 +1,34 @@
+; A hello world without the data segment
+
+define STDOUT 1
+
+entry:
+	move &R1 &SP ; save the current stack position to let writef know where to start writing from
+
+	push8 'H' ; put "Hello, world!" on the stack
+	push8 'e'
+	push8 'l'
+	push8 'l'
+	push8 'o'
+	push8 ','
+	push8 ' '
+	push8 'w'
+	push8 'o'
+	push8 'r'
+	push8 'l'
+	push8 'd'
+	push8 '!'
+	push8 '\n'
+
+	move &R2 1 ; each character is 1 byte big
+
+	move &R3 &SP ; calculate the size of the output
+	sub  &R3 &R1
+
+	move &R4 STDOUT ; output to stdout
+
+	writef
+
+	move &SP &R1 ; pop all the elements off the stack
+
+	halt
