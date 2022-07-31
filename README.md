@@ -19,6 +19,7 @@
 * [Introduction](#introduction)
 * [Quickstart](#quickstart)
 * [Compile the examples](#compile-and-run-the-examples)
+* [Documentation](#documentation)
 * [Bugs](#bugs)
 * [Dependencies](#dependencies)
 * [Make](#make)
@@ -37,6 +38,9 @@ $ ./bin/app
 To compile the examples, run `make example`. All the binaries will be generated in the `./examples`
 folder.
 To run a binary, you need to install the [Temple VM](https://github.com/lordoftrident/temple)
+
+## Documentation
+Coming soon.
 
 ## Bugs
 If you find any bugs, please create an issue and report them.
