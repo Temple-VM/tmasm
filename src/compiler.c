@@ -90,7 +90,6 @@ void compile(const char *p_source_path, const char *p_out_path) {
 
 	if (compiler.err_count > 0) {
 		fputs("\nCompilation aborted.\n", stderr);
-
 		exit(EXIT_FAILURE);
 	}
 
@@ -110,6 +109,7 @@ void compiler_free_macros(compiler_t *p_compiler) {
 		macro_t *macro = LIST_AT(macro_t, &p_compiler->macros, i);
 
 		list_free(&macro->tokens);
+		list_free(&macro->args);
 	}
 
 	list_free(&p_compiler->macros);
@@ -181,7 +181,8 @@ void compiler_macros(compiler_t *p_compiler) {
 }
 
 void compiler_labels(compiler_t *p_compiler) {
-	word_t inst_pos = 0;
+	word_t inst_pos  = 0;
+	bool   has_entry = false;
 
 	for (p_compiler->i = 0; p_compiler->i < p_compiler->tokens.count; ++ p_compiler->i) {
 		p_compiler->token = LIST_AT(token_t, &p_compiler->tokens, p_compiler->i);
@@ -190,8 +191,10 @@ void compiler_labels(compiler_t *p_compiler) {
 		case TOKEN_TYPE_INST: ++ inst_pos; break;
 		case TOKEN_TYPE_LABEL:
 			{
-				if (strcmp(PROGRAM_ENTRY_LABEL, p_compiler->token->data) == 0)
+				if (strcmp(PROGRAM_ENTRY_LABEL, p_compiler->token->data) == 0) {
+					has_entry = true;
 					p_compiler->entry_point = inst_pos;
+				}
 
 				label_t label = {.name = p_compiler->token->data, .inst_pos = inst_pos};
 				list_add(&p_compiler->labels, &label);
@@ -202,6 +205,9 @@ void compiler_labels(compiler_t *p_compiler) {
 		default: break;
 		}
 	}
+
+	if (!has_entry)
+		fatal("Program has no entry point");
 }
 
 void compiler_main(compiler_t *p_compiler) {
@@ -249,6 +255,7 @@ void compiler_macro_definition(compiler_t *p_compiler) {
 		.col  = p_compiler->token->col
 	};
 
+	list_init(&macro.args,   sizeof(char*));
 	list_init(&macro.tokens, sizeof(token_t));
 
 	token_t *macro_declaration   = p_compiler->token;
@@ -256,14 +263,40 @@ void compiler_macro_definition(compiler_t *p_compiler) {
 
 	compiler_next_token(p_compiler);
 	if (p_compiler->token->type != TOKEN_TYPE_ID) {
-		compiler_error(p_compiler, "Expected macro identifier");
+		if (p_compiler->token->type == TOKEN_TYPE_INST)
+			compiler_error_fatal(p_compiler, "Expected macro identifier, got %s",
+			                     token_type_to_str(p_compiler->token));
 
 		return;
 	} else
 		macro.name = p_compiler->token->data;
 
 	compiler_next_token(p_compiler);
-	if (p_compiler->token->type == TOKEN_TYPE_END) {
+	if (p_compiler->token->type == TOKEN_TYPE_END || p_compiler->token->type == TOKEN_TYPE_LPAREN) {
+		if (p_compiler->token->type == TOKEN_TYPE_LPAREN) {
+			compiler_next_token(p_compiler);
+
+			while (p_compiler->token->type != TOKEN_TYPE_RPAREN) {
+				if (p_compiler->token->type == TOKEN_TYPE_END)
+					compiler_error_fatal(p_compiler, "Argument list not ended");
+				else if (p_compiler->token->type != TOKEN_TYPE_ID)
+					compiler_error_fatal(p_compiler, "Expected token type identifier, got %s",
+					                     token_type_to_str(p_compiler->token));
+
+				list_add(&macro.args, &p_compiler->token->data);
+
+				compiler_next_token(p_compiler);
+			}
+
+			if (macro.args.count == 0)
+				compiler_error_fatal(p_compiler, "Empty argument lists are forbidden");
+
+			compiler_next_token(p_compiler);
+			if (p_compiler->token->type != TOKEN_TYPE_END)
+				compiler_error_fatal(p_compiler, "Expected statement end, got %s",
+				                     token_type_to_str(p_compiler->token));
+		}
+
 		compiler_next_token(p_compiler);
 
 		while (true) {
@@ -283,13 +316,12 @@ void compiler_macro_definition(compiler_t *p_compiler) {
 			compiler_next_token(p_compiler);
 		}
 
-		list_remove(&p_compiler->tokens, macro_declaration_i, macro.tokens.count + 4);
-		p_compiler->i -= macro.tokens.count + 4;
-	} else {
-		while (true) {
-			if (p_compiler->token->type == TOKEN_TYPE_END)
-				break;
+		list_remove(&p_compiler->tokens, macro_declaration_i,
+		            macro.tokens.count + 4 + (macro.args.count > 0? macro.args.count + 2 : 0));
 
+		p_compiler->i = macro_declaration_i;
+	} else {
+		while (p_compiler->token->type != TOKEN_TYPE_END) {
 			list_add(&macro.tokens, p_compiler->token);
 
 			++ p_compiler->i;
@@ -322,10 +354,68 @@ void compiler_expand_macro(compiler_t *p_compiler) {
 				token->col  = p_compiler->token->col;
 			}
 
-			list_remove(&p_compiler->tokens, p_compiler->i, 1);
+			list_t args;
+			list_init(&args, sizeof(token_t));
+
+			size_t prev_i = p_compiler->i;
+
+			compiler_next_token(p_compiler);
+			if (p_compiler->token->type == TOKEN_TYPE_LPAREN) {
+				compiler_next_token(p_compiler);
+
+				while (p_compiler->token->type != TOKEN_TYPE_RPAREN) {
+					if (p_compiler->token->type == TOKEN_TYPE_END)
+						compiler_error_fatal(p_compiler, "Argument list not ended");
+
+					list_add(&args, p_compiler->token);
+
+					compiler_next_token(p_compiler);
+				}
+
+				if (args.count == 0)
+					compiler_error_fatal(p_compiler, "Empty argument lists are forbidden");
+
+				if (macro->args.count != args.count)
+					compiler_error_fatal(p_compiler,
+					                     "Macro '%s' expected %li arguments, but got %li",
+					                     macro->name, (long)macro->args.count, (long)args.count);
+			} else {
+				compiler_prev_token(p_compiler);
+
+				if (macro->args.count != 0)
+					compiler_error_fatal(p_compiler, "Macro '%s' expects %li arguments",
+					                     macro->name, macro->args.count);
+			}
+
+			p_compiler->i = prev_i;
+
+			list_remove(&p_compiler->tokens, p_compiler->i,
+			            1 + (args.count > 0? args.count + 2 : 0));
 
 			list_insert(&p_compiler->tokens, p_compiler->i,
 			            macro->tokens.buf, macro->tokens.count);
+
+			if (macro->args.count > 0) {
+				for (size_t i = p_compiler->i; i < p_compiler->i + macro->tokens.count; ++ i) {
+					token_t *token = LIST_AT(token_t, &p_compiler->tokens, i);
+
+					if (token->type == TOKEN_TYPE_ID) {
+						bool   found   = false;
+						size_t arg_idx = 0;
+						for (; arg_idx < macro->args.count; ++ arg_idx) {
+							char *arg_name = *LIST_AT(char*, &macro->args, arg_idx);
+							if (strcmp(arg_name, token->data) == 0) {
+								found = true;
+
+								break;
+							}
+						}
+
+						if (found)
+							*token = *LIST_AT(token_t, &args, arg_idx);
+					}
+				}
+			}
 
 			break;
 		}
@@ -335,13 +425,18 @@ void compiler_expand_macro(compiler_t *p_compiler) {
 void compiler_next_token(compiler_t *p_compiler) {
 	++ p_compiler->i;
 
-	if (p_compiler->i >= p_compiler->tokens.count) {
-		compiler_next_error_fatal(p_compiler);
-		compiler_error(p_compiler, "Unexpected end of file");
-	} else
+	if (p_compiler->i >= p_compiler->tokens.count)
+		compiler_error_fatal(p_compiler, "Unexpected end of file");
+	else
 		p_compiler->token = LIST_AT(token_t, &p_compiler->tokens, p_compiler->i);
 }
 
+void compiler_prev_token(compiler_t *p_compiler) {
+	assert(p_compiler->i > 0 && "This should never fail");
+
+	-- p_compiler->i;
+	p_compiler->token = LIST_AT(token_t, &p_compiler->tokens, p_compiler->i);
+}
 
 void compiler_push_inst(compiler_t *p_compiler, opcode_t p_opcode, reg_t p_reg, word_t p_data) {
 	inst_t inst = {.opcode = p_opcode, .reg = p_reg, .data = p_data};
@@ -1491,9 +1586,26 @@ void compiler_error(compiler_t *p_compiler, const char *p_fmt, ...) {
 	++ p_compiler->err_count;
 	if (p_compiler->err_count >= MAX_COMPILER_ERRS) {
 		fputs("\nCompilation aborted.\n", stderr);
-
 		exit(EXIT_FAILURE);
 	}
+}
+
+void compiler_error_fatal(compiler_t *p_compiler, const char *p_fmt, ...) {
+	char    msg[1024];
+	va_list args;
+
+	va_start(args, p_fmt);
+	vsnprintf(msg, sizeof(msg), p_fmt, args);
+	va_end(args);
+
+	if (p_compiler->err_count > 0)
+		putchar('\n');
+
+	error_at(p_compiler->token->row + 1, p_compiler->token->col + 1, p_compiler->token->line,
+	         p_compiler->path, "Compiler error", msg);
+
+	fputs("\nCompilation aborted.\n", stderr);
+	exit(EXIT_FAILURE);
 }
 
 void compiler_error_at_prev(compiler_t *p_compiler, token_t *p_prev, const char *p_fmt, ...) {
@@ -1510,8 +1622,4 @@ void compiler_error_at_prev(compiler_t *p_compiler, token_t *p_prev, const char 
 	compiler_error(p_compiler, msg);
 
 	p_compiler->token = current_token;
-}
-
-void compiler_next_error_fatal(compiler_t *p_compiler) {
-	p_compiler->err_count = MAX_COMPILER_ERRS;
 }

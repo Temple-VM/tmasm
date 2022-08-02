@@ -13,6 +13,11 @@
 #include "token.h"
 #include "target.h"
 
+#define CASE_SEPARATORS \
+	     '(': case ')': -- p_lexer->col; /* fall through */  \
+	case ' ': case '\t': case '\v': case '\f': case '\r' \
+
+
 typedef struct {
 	const char *path;
 	FILE       *file;

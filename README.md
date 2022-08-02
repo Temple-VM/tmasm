@@ -19,6 +19,7 @@
 * [Introduction](#introduction)
 * [Quickstart](#quickstart)
 * [Compile the examples](#compile-and-run-the-examples)
+* [Milestones](#Milestones)
 * [Documentation](#documentation)
 * [Bugs](#bugs)
 * [Dependencies](#dependencies)
@@ -38,6 +39,12 @@ $ ./bin/app
 To compile the examples, run `make example`. All the binaries will be generated in the `./examples`
 folder.
 To run a binary, you need to install the [Temple VM](https://github.com/lordoftrident/temple)
+
+## Milestones
+- [X] Labels, compile all instructions from Temple 1.0.0 and generate an executable
+- [X] Macros + macro parameters
+- [ ] Include keyword
+- [ ] Data segment
 
 ## Documentation
 Coming soon.

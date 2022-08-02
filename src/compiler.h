@@ -27,6 +27,7 @@
 	case TOKEN_TYPE_CHAR: case TOKEN_TYPE_ID
 
 /* TODO: prevent name conflicts with labels and macros */
+/* TODO: warn about unused macro parameters */
 
 typedef struct {
 	const char *name;
@@ -35,6 +36,8 @@ typedef struct {
 
 	char  *line;
 	size_t row, col;
+
+	list_t args;
 } macro_t;
 
 typedef struct {
@@ -81,6 +84,7 @@ void compiler_macro_definition(compiler_t *p_compiler);
 void compiler_expand_macro(compiler_t *p_compiler);
 
 void compiler_next_token(compiler_t *p_compiler);
+void compiler_prev_token(compiler_t *p_compiler);
 
 void compiler_push_inst(compiler_t *p_compiler, opcode_t p_opcode, reg_t p_reg, word_t p_data);
 
@@ -147,7 +151,7 @@ void compiler_inst_debug(compiler_t *p_compiler, size_t p_argc);
 void compiler_inst_halt(compiler_t *p_compiler, size_t p_argc);
 
 void compiler_error(compiler_t *p_compiler, const char *p_fmt, ...);
+void compiler_error_fatal(compiler_t *p_compiler, const char *p_fmt, ...);
 void compiler_error_at_prev(compiler_t *p_compiler, token_t *p_prev, const char *p_fmt, ...);
-void compiler_next_error_fatal(compiler_t *p_compiler);
 
 #endif

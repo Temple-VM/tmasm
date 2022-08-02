@@ -86,8 +86,6 @@ bool lexer_line(lexer_t *p_lexer) {
 			token_lexed = true;
 	}
 
-
-
 	/* we dont need bloat new line tokens */
 	if (token_lexed) {
 		token_t token = token_new(TOKEN_TYPE_END, NULL, p_lexer->line, p_lexer->row, p_lexer->col);
@@ -120,12 +118,29 @@ bool lexer_token(lexer_t *p_lexer) {
 			continue;
 
 		case ';': lexer_skip_comment(p_lexer); goto no_token;
+		case '|':
+			lexer_add_to_token(p_lexer, ch);
+			p_lexer->token.type = TOKEN_TYPE_END;
+
+			break;
 
 		case '"':
 			p_lexer->token.type = TOKEN_TYPE_STR;
 
 			++ p_lexer->col;
 			lexer_str(p_lexer);
+
+			break;
+
+		case '(':
+			lexer_add_to_token(p_lexer, ch);
+			p_lexer->token.type = TOKEN_TYPE_LPAREN;
+
+			break;
+
+		case ')':
+			lexer_add_to_token(p_lexer, ch);
+			p_lexer->token.type = TOKEN_TYPE_RPAREN;
 
 			break;
 
@@ -291,7 +306,7 @@ void lexer_dec(lexer_t *p_lexer) {
 		char ch = p_lexer->line[p_lexer->col];
 
 		switch (ch) {
-		case ' ': case '\t': case '\v': case '\f': case '\r': return;
+		case CASE_SEPARATORS: return;
 		default:
 			if (!isdigit(ch))
 				lexer_fatal(p_lexer, "Unexpected character '%c' in decimal", ch);
@@ -306,7 +321,7 @@ void lexer_hex(lexer_t *p_lexer) {
 		char ch = p_lexer->line[p_lexer->col];
 
 		switch (ch) {
-		case ' ': case '\t': case '\v': case '\f': case '\r': return;
+		case CASE_SEPARATORS: return;
 		default:
 			if (!isdigit(ch) && ch < 'a' && ch > 'f' && ch < 'A' && ch > 'F')
 				lexer_fatal(p_lexer, "Unexpected character '%c' in hexadecimal", ch);
@@ -321,7 +336,7 @@ void lexer_word(lexer_t *p_lexer) {
 		char ch = p_lexer->line[p_lexer->col];
 
 		switch (ch) {
-		case ' ': case '\t': case '\v': case '\f': case '\r':
+		case CASE_SEPARATORS:
 			goto finish;
 
 		case ':':

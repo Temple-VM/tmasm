@@ -1,0 +1,66 @@
+define STDOUT 1
+
+define WRITEF (addr memb_size size stream)
+	move &R1 addr
+	move &R2 memb_size
+	move &R3 size
+	move &R4 stream
+
+	writef
+end
+
+define ADD_AND_PUSH_TO_STACK64 (x y)
+	move   &R1 x
+	add    &R1 y
+	push64 &R1
+end
+
+define ENDL
+	move &R1 &SP
+	push8 '\n'
+
+	move &R2 1
+	move &R3 1
+	move &R4 STDOUT
+
+	writef
+
+	pop8
+end
+
+define PRINT_1_DIGIT_FROM_STACK8
+	move &R1 &SP
+	sub  &R1 1
+
+	read8  &R2 &R1
+	add    &R2 '0'
+	write8 &R1 &R2
+
+	move &R2 1
+	move &R3 1
+	move &R4 STDOUT
+
+	writef
+
+	pop8
+end
+
+entry:
+	move &R1 &SP
+	push8 '5'
+	push8 ' '
+	push8 '+'
+	push8 ' '
+	push8 '2'
+	push8 ' '
+	push8 '='
+	push8 ' ' ;8 chars
+
+	WRITEF (&R1 1 8 STDOUT)
+
+	ADD_AND_PUSH_TO_STACK64 (5 2)
+	PRINT_1_DIGIT_FROM_STACK8     ; temple is little endian, so we can safely assume that the last
+	                              ; byte which holds the result is at the top
+	ENDL
+
+	halt

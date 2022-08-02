@@ -66,6 +66,9 @@ void list_insert(list_t *p_list, size_t p_idx, void *p_start, size_t p_count) {
 		for (size_t j = 0; j < p_list->memb_size; ++ j)
 			byte_buf[(i + p_count) *
 			         p_list->memb_size + j] = byte_buf[i * p_list->memb_size + j];
+
+		if (i == 0) /* prevent i wrapping around */
+			break;
 	}
 
 	/* paste the new elements in */

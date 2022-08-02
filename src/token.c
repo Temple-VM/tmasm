@@ -20,6 +20,9 @@ const char *token_type_to_str(token_t *p_token) {
 	case TOKEN_TYPE_STR:  return "string";      break;
 	case TOKEN_TYPE_REG:  return "register";    break;
 
+	case TOKEN_TYPE_LPAREN: return "("; break;
+	case TOKEN_TYPE_RPAREN: return ")"; break;
+
 	case TOKEN_TYPE_LABEL:   return "label";       break;
 	case TOKEN_TYPE_KEYWORD: return "keyword";     break;
 	case TOKEN_TYPE_INST:    return "instruction"; break;
