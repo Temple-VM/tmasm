@@ -2,18 +2,18 @@
 
 void help(void) {
 	puts(" ________  ___  ___   ________  ___\n"
-         "|_   _|  \\/  | / _ \\ /  ___|  \\/  |\n"
-         "  | | | .  . |/ /_\\ \\\\ `--.| .  . |\n"
-         "  | | | |\\/| ||  _  | `--. \\ |\\/| |\n"
-         "  | | | |  | || | | |/\\__/ / |  | |\n"
-         "  \\_/ \\_|  |_/\\_| |_/\\____/\\_|  |_/\n"
-	     "\n"
-	     "Github: https://github.com/Temple-VM/tmasm\n"
-	     "\n"
-	     "Usage: tmasm [OPTIONS] [FILE [OUT]]\n"
-	     "OPTIONS:\n"
-	     "  -h, --help,    - show this message\n"
-	     "  -v, --version  - show the version");
+		"|_   _|  \\/  | / _ \\ /  ___|  \\/  |\n"
+		"  | | | .  . |/ /_\\ \\\\ `--.| .  . |\n"
+		"  | | | |\\/| ||  _  | `--. \\ |\\/| |\n"
+		"  | | | |  | || | | |/\\__/ / |  | |\n"
+		"  \\_/ \\_|  |_/\\_| |_/\\____/\\_|  |_/\n"
+		"\n"
+		"Github: https://github.com/Temple-VM/tmasm\n"
+		"\n"
+		"Usage: tmasm [OPTIONS] [FILE [OUT]]\n"
+		"OPTIONS:\n"
+		"  -h, --help,    - show this message\n"
+		"  -v, --version  - show the version");
 
 	exit(0);
 }
