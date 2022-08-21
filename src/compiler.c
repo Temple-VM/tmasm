@@ -292,8 +292,8 @@ inst_t compiler_compile_inst_none(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {.opcode = OPCODE_NONE};
 
 	if (p_argc != 2) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -306,8 +306,8 @@ inst_t compiler_compile_inst_move(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 2) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -331,8 +331,8 @@ inst_t compiler_compile_inst_write(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 2) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -372,8 +372,8 @@ inst_t compiler_compile_inst_read(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 2) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -413,8 +413,8 @@ inst_t compiler_compile_inst_push(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 1) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 1 argument, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -452,8 +452,8 @@ inst_t compiler_compile_inst_pusha(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {.opcode = OPCODE_PUSH_A};
 
 	if (p_argc != 0) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 0 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -486,8 +486,8 @@ inst_t compiler_compile_inst_pop(compiler_t *p_compiler, size_t p_argc) {
 		default: INTERNAL_BUG;
 		}
 	} else {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 1 or 0 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 1 or 0 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -500,8 +500,8 @@ inst_t compiler_compile_inst_popa(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {.opcode = OPCODE_POP_A};
 
 	if (p_argc != 0) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 0 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -514,8 +514,8 @@ inst_t compiler_compile_inst_eq(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 2) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -539,8 +539,8 @@ inst_t compiler_compile_inst_neq(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 2) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -564,8 +564,8 @@ inst_t compiler_compile_inst_gt(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 2) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -589,8 +589,8 @@ inst_t compiler_compile_inst_ge(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 2) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -614,8 +614,8 @@ inst_t compiler_compile_inst_lt(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 2) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -639,8 +639,8 @@ inst_t compiler_compile_inst_le(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 2) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -664,8 +664,8 @@ inst_t compiler_compile_inst_jump(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 1) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 1 argument, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -687,8 +687,8 @@ inst_t compiler_compile_inst_jumpt(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 1) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 1 argument, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -710,8 +710,8 @@ inst_t compiler_compile_inst_jumpf(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 1) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 1 argument, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -733,8 +733,8 @@ inst_t compiler_compile_inst_add(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 2) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -758,8 +758,8 @@ inst_t compiler_compile_inst_inc(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {.opcode = OPCODE_INC};
 
 	if (p_argc != 1) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 1 argument, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -774,8 +774,8 @@ inst_t compiler_compile_inst_sub(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 2) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -799,8 +799,8 @@ inst_t compiler_compile_inst_dec(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {.opcode = OPCODE_DEC};
 
 	if (p_argc != 1) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 1 argument, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -815,8 +815,8 @@ inst_t compiler_compile_inst_mult(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 2) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -840,8 +840,8 @@ inst_t compiler_compile_inst_div(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 2) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -865,8 +865,8 @@ inst_t compiler_compile_inst_mod(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 2) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -902,8 +902,8 @@ inst_t compiler_compile_inst_and(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {.opcode = OPCODE_AND};
 
 	if (p_argc != 2) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -919,8 +919,8 @@ inst_t compiler_compile_inst_or(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {.opcode = OPCODE_OR};
 
 	if (p_argc != 2) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -936,8 +936,8 @@ inst_t compiler_compile_inst_not(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {.opcode = OPCODE_NOT};
 
 	if (p_argc != 1) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 1 argument, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -964,8 +964,8 @@ inst_t compiler_compile_inst_call(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 1) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 1 argument, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -987,8 +987,8 @@ inst_t compiler_compile_inst_callt(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 1) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 1 argument, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -1010,8 +1010,8 @@ inst_t compiler_compile_inst_callf(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 1) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 1 argument, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -1033,8 +1033,8 @@ inst_t compiler_compile_inst_ret(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {.opcode = OPCODE_RET};
 
 	if (p_argc != 0) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 0 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -1047,8 +1047,8 @@ inst_t compiler_compile_inst_syscall(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {0};
 
 	if (p_argc != 1) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 1 argument, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
@@ -1070,8 +1070,8 @@ inst_t compiler_compile_inst_halt(compiler_t *p_compiler, size_t p_argc) {
 	inst_t inst = {.opcode = OPCODE_HALT};
 
 	if (p_argc != 0) {
-		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
-		      name, (long)p_argc);
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 0 arguments, got %zu",
+		      name, p_argc);
 
 		aborted();
 	}
