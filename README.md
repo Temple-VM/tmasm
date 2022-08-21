@@ -6,11 +6,11 @@
 	<a href="./LICENSE">
 		<img alt="License" src="https://img.shields.io/badge/license-GPL-blue?color=7aca00"/>
 	</a>
-	<a href="https://github.com/LordOfTrident/tmasm/issues">
-		<img alt="Issues" src="https://img.shields.io/github/issues/LordOfTrident/tmasm?color=0088ff"/>
+	<a href="https://github.com/Temple-VM/tmasm/issues">
+		<img alt="Issues" src="https://img.shields.io/github/issues/Temple-VM/tmasm?color=0088ff"/>
 	</a>
-	<a href="https://github.com/LordOfTrident/tmasm/pulls">
-		<img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/LordOfTrident/tmasm?color=0088ff"/>
+	<a href="https://github.com/Temple-VM/tmasm/pulls">
+		<img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/Temple-VM/tmasm?color=0088ff"/>
 	</a>
 	<br><br><br>
 </p>
