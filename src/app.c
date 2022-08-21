@@ -8,7 +8,7 @@ void help(void) {
          "  | | | |  | || | | |/\\__/ / |  | |\n"
          "  \\_/ \\_|  |_/\\_| |_/\\____/\\_|  |_/\n"
 	     "\n"
-	     "Github: https://github.com/lordoftrident/tmasm\n"
+	     "Github: https://github.com/Temple-VM/tmasm\n"
 	     "\n"
 	     "Usage: tmasm [OPTIONS] [FILE [OUT]]\n"
 	     "OPTIONS:\n"
