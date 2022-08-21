@@ -13,7 +13,8 @@ void help(void) {
 	     "Usage: tmasm [OPTIONS] [FILE [OUT]]\n"
 	     "OPTIONS:\n"
 	     "  -h, --help,    - show this message\n"
-	     "  -v, --version  - show the version");
+	     "  -v, --version  - show the version\n"
+	     "  -o<path>       - set the output path");
 
 	exit(0);
 }
