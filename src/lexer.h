@@ -1,56 +1,63 @@
 #ifndef LEXER_H__HEADER_GUARD__
 #define LEXER_H__HEADER_GUARD__
 
-#include <stdlib.h>  /* size_t, malloc, realloc, free */
-#include <stdio.h>   /* FILE, fopen, fclose, fgetc */
-#include <stdarg.h>  /* va_list, va_start, va_end, vsnprintf */
-#include <string.h>  /* strncpy, strcmp */
-#include <ctype.h>   /* isalpha, isalnum, isdigit */
-#include <assert.h>  /* assert */
+#include <stdlib.h>  /* size_t */
+#include <stdio.h>   /* FILE, fopen, fclose */
 #include <stdbool.h> /* bool, true, false */
+#include <string.h>  /* strcmp, strlen */
+#include <ctype.h>   /* isdigit, isxdigit, isalpha, isspace, tolower */
 
 #include "error.h"
+#include "list.h"
+#include "utils.h"
 #include "token.h"
-#include "target.h"
 
-#define CASE_SEPARATORS \
-	     '(': case ')': -- p_lexer->col; /* fall through */  \
-	case ' ': case '\t': case '\v': case '\f': case '\r' \
-
+#define IS_SEPARATOR(p_ch) (p_ch == ',' || p_ch == '(' || p_ch == ')')
 
 typedef struct {
 	const char *path;
-	FILE       *file;
+	FILE       *stream;
 
-	list_t tokens;
+	char   ch;
+	char   line[512];
+	size_t line_len;
 
-	list_t lines;
-	char  *line;
-	size_t line_len, row, col;
+	char   data[256];
+	size_t data_len;
 
-	token_t token;
-	char   *token_str;
-	size_t  token_buf_size, token_len;
+	location_t loc;
+	token_t    tok;
+	   /* token_t */
+	list_t toks;
 } lexer_t;
 
-extern const char *g_keywords[];
+extern pair_t g_keywords[];
+extern pair_t g_regs[];
 
-lexer_t lex(const char *p_path);
+lexer_t lexer_new(const char *p_path);
+list_t  lexer_lex(lexer_t *p_lexer);
 
-void lexer_free_lines(lexer_t *p_lexer);
+bool lexer_next_line(lexer_t *p_lexer);
+void lexer_lex_line(lexer_t *p_lexer);
 
-bool lexer_line(lexer_t *p_lexer);
-bool lexer_token(lexer_t *p_lexer);
+void lexer_lex_hex(lexer_t *p_lexer);
+void lexer_lex_dec(lexer_t *p_lexer);
+void lexer_lex_ch(lexer_t *p_lexer);
 
-void lexer_skip_comment(lexer_t *p_lexer);
-void lexer_str(lexer_t *p_lexer);
-void lexer_char(lexer_t *p_lexer);
-void lexer_dec(lexer_t *p_lexer);
-void lexer_hex(lexer_t *p_lexer);
-void lexer_word(lexer_t *p_lexer);
+void lexer_lex_str(lexer_t *p_lexer);
 
-void lexer_add_to_token(lexer_t *p_lexer, char p_ch);
+void lexer_lex_id(lexer_t *p_lexer);
+void lexer_lex_reg(lexer_t *p_lexer);
 
-void lexer_fatal(lexer_t *p_lexer, const char *p_fmt, ...);
+void lexer_lex_skip_comment(lexer_t *p_lexer);
+
+void lexer_push_token(lexer_t *p_lexer, token_type_t p_type);
+
+void lexer_add_ch(lexer_t *p_lexer);
+void lexer_token_start_here(lexer_t *p_lexer);
+
+bool lexer_at_line_end(lexer_t *p_lexer);
+void lexer_next_ch(lexer_t *p_lexer);
+void lexer_prev_ch(lexer_t *p_lexer);
 
 #endif

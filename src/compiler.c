@@ -1,129 +1,173 @@
 #include "compiler.h"
 
-inst_func_map_t g_insts_map[] = {
-	{.name = "move", .func = compiler_inst_move},
+inst_func_t g_inst_func_map[] = {
+	{.key = TOKEN_TYPE_INST_NONE, .func = compiler_compile_inst_none},
 
-	{.name = "write64", .func = compiler_inst_write64},
-	{.name = "write32", .func = compiler_inst_write32},
-	{.name = "write16", .func = compiler_inst_write16},
-	{.name = "write8",  .func = compiler_inst_write8},
+	{.key = TOKEN_TYPE_INST_MOVE, .func = compiler_compile_inst_move},
 
-	{.name = "read64", .func = compiler_inst_read64},
-	{.name = "read32", .func = compiler_inst_read32},
-	{.name = "read16", .func = compiler_inst_read16},
-	{.name = "read8",  .func = compiler_inst_read8},
+	{.key = TOKEN_TYPE_INST_WRITE, .func = compiler_compile_inst_write},
+	{.key = TOKEN_TYPE_INST_READ,  .func = compiler_compile_inst_read},
 
-	{.name = "push64", .func = compiler_inst_push64},
-	{.name = "push32", .func = compiler_inst_push32},
-	{.name = "push16", .func = compiler_inst_push16},
-	{.name = "push8",  .func = compiler_inst_push8},
-	{.name = "pusha",  .func = compiler_inst_pusha},
+	{.key = TOKEN_TYPE_INST_PUSH,   .func = compiler_compile_inst_push},
+	{.key = TOKEN_TYPE_INST_PUSH_A, .func = compiler_compile_inst_pusha},
 
-	{.name = "pop64", .func = compiler_inst_pop64},
-	{.name = "pop32", .func = compiler_inst_pop32},
-	{.name = "pop16", .func = compiler_inst_pop16},
-	{.name = "pop8",  .func = compiler_inst_pop8},
-	{.name = "popa",  .func = compiler_inst_popa},
+	{.key = TOKEN_TYPE_INST_POP,   .func = compiler_compile_inst_pop},
+	{.key = TOKEN_TYPE_INST_POP_A, .func = compiler_compile_inst_popa},
 
-	{.name = "eq",  .func = compiler_inst_eq},
-	{.name = "neq", .func = compiler_inst_neq},
-	{.name = "gt",  .func = compiler_inst_gt},
-	{.name = "ge",  .func = compiler_inst_ge},
-	{.name = "lt",  .func = compiler_inst_lt},
-	{.name = "le",  .func = compiler_inst_le},
+	{.key = TOKEN_TYPE_INST_EQ,  .func = compiler_compile_inst_eq},
+	{.key = TOKEN_TYPE_INST_NEQ, .func = compiler_compile_inst_neq},
+	{.key = TOKEN_TYPE_INST_GT,  .func = compiler_compile_inst_gt},
+	{.key = TOKEN_TYPE_INST_GE,  .func = compiler_compile_inst_ge},
+	{.key = TOKEN_TYPE_INST_LT,  .func = compiler_compile_inst_lt},
+	{.key = TOKEN_TYPE_INST_LE,  .func = compiler_compile_inst_le},
 
-	{.name = "jump",  .func = compiler_inst_jump},
-	{.name = "jumpt", .func = compiler_inst_jumpt},
-	{.name = "jumpf", .func = compiler_inst_jumpf},
+	{.key = TOKEN_TYPE_INST_JUMP,  .func = compiler_compile_inst_jump},
+	{.key = TOKEN_TYPE_INST_JUMPT, .func = compiler_compile_inst_jumpt},
+	{.key = TOKEN_TYPE_INST_JUMPF, .func = compiler_compile_inst_jumpf},
 
-	{.name = "add", .func = compiler_inst_add},
-	{.name = "inc", .func = compiler_inst_inc},
+	{.key = TOKEN_TYPE_INST_ADD, .func = compiler_compile_inst_add},
+	{.key = TOKEN_TYPE_INST_INC, .func = compiler_compile_inst_inc},
 
-	{.name = "sub", .func = compiler_inst_sub},
-	{.name = "dec", .func = compiler_inst_dec},
+	{.key = TOKEN_TYPE_INST_SUB, .func = compiler_compile_inst_sub},
+	{.key = TOKEN_TYPE_INST_DEC, .func = compiler_compile_inst_dec},
 
-	{.name = "mult", .func = compiler_inst_mult},
-	{.name = "div",  .func = compiler_inst_div},
-	{.name = "mod",  .func = compiler_inst_mod},
+	{.key = TOKEN_TYPE_INST_MULT, .func = compiler_compile_inst_mult},
+	{.key = TOKEN_TYPE_INST_DIV,  .func = compiler_compile_inst_div},
+	{.key = TOKEN_TYPE_INST_MOD, .func = compiler_compile_inst_mod},
 
-	{.name = "call",  .func = compiler_inst_call},
-	{.name = "callt", .func = compiler_inst_callt},
-	{.name = "callf", .func = compiler_inst_callf},
-	{.name = "ret",  .func = compiler_inst_ret},
+	{.key = TOKEN_TYPE_INST_RSHIFT, .func = compiler_compile_inst_rshift},
+	{.key = TOKEN_TYPE_INST_LSHIFT, .func = compiler_compile_inst_lshift},
 
-	{.name = "writef", .func = compiler_inst_writef},
+	{.key = TOKEN_TYPE_INST_AND, .func = compiler_compile_inst_and},
+	{.key = TOKEN_TYPE_INST_OR,  .func = compiler_compile_inst_or},
+	{.key = TOKEN_TYPE_INST_NOT, .func = compiler_compile_inst_not},
 
-	{.name = "memset",  .func = compiler_inst_memset},
-	{.name = "memcopy", .func = compiler_inst_memcopy},
+	{.key = TOKEN_TYPE_INST_BITAND, .func = compiler_compile_inst_bitand},
+	{.key = TOKEN_TYPE_INST_BITOR,  .func = compiler_compile_inst_bitor},
 
-	{.name = "debug", .func = compiler_inst_debug},
+	{.key = TOKEN_TYPE_INST_CALL,  .func = compiler_compile_inst_call},
+	{.key = TOKEN_TYPE_INST_CALLT, .func = compiler_compile_inst_callt},
+	{.key = TOKEN_TYPE_INST_CALLF, .func = compiler_compile_inst_callf},
+	{.key = TOKEN_TYPE_INST_RET,   .func = compiler_compile_inst_ret},
 
-	{.name = "halt", .func = compiler_inst_halt}
+	{.key = TOKEN_TYPE_INST_SYSCALL, .func = compiler_compile_inst_syscall},
+
+	{.key = TOKEN_TYPE_INST_HALT, .func = compiler_compile_inst_halt},
 };
 
-void compile(const char *p_source_path, const char *p_out_path) {
-	assert(sizeof(g_insts_map) / sizeof(g_insts_map[0]) == IMPLEMENTED_INSTS);
+void write_word_to_file(FILE *p_file, word_t p_data) {
+	uint8_t bytes[sizeof(word_t)] = {
+        (p_data & 0xFF00000000000000) >> 070,
+        (p_data & 0x00FF000000000000) >> 060,
+        (p_data & 0x0000FF0000000000) >> 050,
+        (p_data & 0x000000FF00000000) >> 040,
+        (p_data & 0x00000000FF000000) >> 030,
+        (p_data & 0x0000000000FF0000) >> 020,
+        (p_data & 0x000000000000FF00) >> 010,
+        (p_data & 0x00000000000000FF)
+	};
 
-	test();
-
-	lexer_t lexer = lex(p_source_path);
-
-	/* tokens_dump(&tokens); */
-
-	/* if we lexed no tokens */
-	if (lexer.tokens.count == 0)
-		fatal("'%s' is an empty file", p_source_path);
-
-	compiler_t compiler;
-	memset(&compiler, 0, sizeof(compiler_t));
-
-	list_init(&compiler.macros, sizeof(macro_t));
-	list_init(&compiler.labels, sizeof(label_t));
-	list_init(&compiler.insts,  sizeof(inst_t));
-
-	compiler.path   = p_source_path;
-	compiler.tokens = list_copy(&lexer.tokens);
-
-	compiler_macros(&compiler);
-	compiler_labels(&compiler);
-	compiler_main(&compiler);
-
-	if (compiler.err_count > 0) {
-		fputs("\nCompilation aborted.\n", stderr);
-		exit(EXIT_FAILURE);
-	}
-
-	compiler_write_file(&compiler, p_out_path);
-
-	compiler_free_macros(&compiler);
-	list_free(&compiler.labels);
-	list_free(&compiler.insts);
-	list_free(&compiler.tokens);
-
-	tokens_free(&lexer.tokens);
-	lexer_free_lines(&lexer);
+	fwrite(bytes, 1, sizeof(bytes), p_file);
 }
 
-void compiler_free_macros(compiler_t *p_compiler) {
-	for (size_t i = 0; i < p_compiler->macros.count; ++ i) {
-		macro_t *macro = LIST_AT(macro_t, &p_compiler->macros, i);
+compiler_t compiler_new(const char *p_path) {
+	compiler_t compiler = {0};
+	compiler.parser = parser_new(p_path);
 
-		list_free(&macro->tokens);
-		list_free(&macro->args);
-	}
+#ifdef TMASM_DEBUG
+	for (size_t i = 0; i < compiler.parser.toks.count; ++ i)
+		token_dump(LIST_AT(token_t, &compiler.parser.toks, i));
 
-	list_free(&p_compiler->macros);
+	puts("\n");
+#endif
+
+	compiler.path = p_path;
+
+	compiler.nodes = list_new(sizeof(node_t), LIST_FREE_FUNC(node_free_tree));
+
+	compiler.data        = list_new(sizeof(uint8_t),      NULL);
+	compiler.insts       = list_new(sizeof(inst_t),       NULL);
+	compiler.labels      = list_new(sizeof(label_t),      LIST_FREE_FUNC(label_free));
+	compiler.data_consts = list_new(sizeof(data_const_t), LIST_FREE_FUNC(data_const_free));
+
+	return compiler;
 }
 
-void compiler_write_file(compiler_t *p_compiler, const char *p_out_path) {
-	FILE *file = fopen(p_out_path, "w");
+void compiler_compile(compiler_t *p_compiler, const char *p_output_path) {
+	/* first, compile all of the label declarations and store all other nodes inside a list
+	   to inspect later */
+	while ((p_compiler->node = parser_parse_next(&p_compiler->parser)) != NULL) {
+#ifdef TMASM_DEBUG
+		node_dump(p_compiler->node);
+#endif
+
+		switch (p_compiler->node->type) {
+		case NODE_TYPE_DATA:
+		case NODE_TYPE_INST:
+			list_push(&p_compiler->nodes, p_compiler->node);
+			free(p_compiler->node);
+
+			break;
+
+		case NODE_TYPE_LABEL:
+			compiler_compile_label(p_compiler);
+			node_free_tree(p_compiler->node);
+
+			break;
+
+		default: INTERNAL_BUG;
+		}
+	}
+
+	/* after all the label definitions were compiled, compile the rest of the nodes */
+	for (size_t i = 0; i < p_compiler->nodes.count; ++ i) {
+		p_compiler->node = LIST_AT(node_t, &p_compiler->nodes, i);
+
+		switch (p_compiler->node->type) {
+		case NODE_TYPE_DATA: compiler_compile_data(p_compiler); break;
+		case NODE_TYPE_INST: compiler_compile_inst(p_compiler); break;
+
+		default: INTERNAL_BUG;
+		}
+	}
+
+	compiler_generate_tm_file(p_compiler, p_output_path);
+
+	parser_free(&p_compiler->parser);
+
+	list_free(&p_compiler->data);
+	list_free(&p_compiler->insts);
+	list_free(&p_compiler->labels);
+	list_free(&p_compiler->data_consts);
+}
+
+void compiler_generate_tm_file(compiler_t *p_compiler, const char *p_path) {
+	label_t *entry_point = NULL;
+
+	for (size_t i = 0; i < p_compiler->labels.count; ++ i) {
+		label_t *label = LIST_AT(label_t, &p_compiler->labels, i);
+
+		if (strcmp(label->name, ENTRY_LABEL) == 0) {
+			entry_point = label;
+
+			break;
+		}
+	}
+
+	if (entry_point == NULL)
+		fatal("%s: Entry label "QUOTES("%s")" not found", p_compiler->path, ENTRY_LABEL);
+
+	FILE *file = fopen(p_path, "w");
 	if (file == NULL)
-		fatal("Could not write file '%s'", p_out_path);
+		fatal("Could not write file "QUOTES("%s"), p_path);
 
 	fputs("#!/usr/bin/temple\nTM", file);
 
-	compiler_write_word_bytes(file, p_compiler->entry_point);
-	compiler_write_word_bytes(file, (word_t)p_compiler->insts.count);
+	write_word_to_file(file, entry_point->addr);
+	//write_word_to_file(file, p_compiler->data.count);
+	write_word_to_file(file, p_compiler->insts.count);
+
+	//fwrite(p_compiler->data.buf, 1, p_compiler->data.count, file);
 
 	for (size_t i = 0; i < p_compiler->insts.count; ++ i) {
 		inst_t *inst = LIST_AT(inst_t, &p_compiler->insts, i);
@@ -147,1479 +191,981 @@ void compiler_write_file(compiler_t *p_compiler, const char *p_out_path) {
 	fclose(file);
 }
 
-void compiler_write_word_bytes(FILE *p_file, word_t p_data) {
-	uint8_t bytes[sizeof(word_t)] = {
-        (p_data & 0xFF00000000000000) >> 070,
-        (p_data & 0x00FF000000000000) >> 060,
-        (p_data & 0x0000FF0000000000) >> 050,
-        (p_data & 0x000000FF00000000) >> 040,
-        (p_data & 0x00000000FF000000) >> 030,
-        (p_data & 0x0000000000FF0000) >> 020,
-        (p_data & 0x000000000000FF00) >> 010,
-        (p_data & 0x00000000000000FF)
+void compiler_compile_data(compiler_t *p_compiler) {
+	data_const_t data_const = {
+		.name = copy_str(p_compiler->node->right->tok->data),
+		.addr = p_compiler->data.count
 	};
 
-	fwrite(bytes, 1, sizeof(bytes), p_file);
-}
+	switch (p_compiler->node->left->type) {
+	case NODE_TYPE_NUM:
+		{
+			uint64_t data = p_compiler->node->left->data.num;
 
-void compiler_macros(compiler_t *p_compiler) {
-	for (p_compiler->i = 0; p_compiler->i < p_compiler->tokens.count; ++ p_compiler->i) {
-		p_compiler->token = LIST_AT(token_t, &p_compiler->tokens, p_compiler->i);
+			switch (p_compiler->node->size) {
+			case 8: LIST_PUSH(uint8_t, &p_compiler->data, data); break;
+			case 16:
+				LIST_PUSH(uint8_t, &p_compiler->data, (data & 0xFF00) >> 010);
+				LIST_PUSH(uint8_t, &p_compiler->data,  data & 0x00FF);
 
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_KEYWORD:
-			if (strcmp("define", p_compiler->token->data) == 0)
-				compiler_macro_definition(p_compiler);
+				break;
 
-			break;
+			case 32:
+				LIST_PUSH(uint8_t, &p_compiler->data, (data & 0xFF000000) >> 030);
+				LIST_PUSH(uint8_t, &p_compiler->data, (data & 0x00FF0000) >> 020);
+				LIST_PUSH(uint8_t, &p_compiler->data, (data & 0x0000FF00) >> 010);
+				LIST_PUSH(uint8_t, &p_compiler->data,  data & 0x000000FF);
 
-		case TOKEN_TYPE_ID: compiler_expand_macro(p_compiler); break;
+				break;
 
-		default: break;
-		}
-	}
-}
+			case 64:
+				LIST_PUSH(uint8_t, &p_compiler->data, (data & 0xFF00000000000000) >> 070);
+				LIST_PUSH(uint8_t, &p_compiler->data, (data & 0x00FF000000000000) >> 060);
+				LIST_PUSH(uint8_t, &p_compiler->data, (data & 0x0000FF0000000000) >> 050);
+				LIST_PUSH(uint8_t, &p_compiler->data, (data & 0x000000FF00000000) >> 040);
+				LIST_PUSH(uint8_t, &p_compiler->data, (data & 0x00000000FF000000) >> 030);
+				LIST_PUSH(uint8_t, &p_compiler->data, (data & 0x0000000000FF0000) >> 020);
+				LIST_PUSH(uint8_t, &p_compiler->data, (data & 0x000000000000FF00) >> 010);
+				LIST_PUSH(uint8_t, &p_compiler->data,  data & 0x00000000000000ff);
 
-void compiler_labels(compiler_t *p_compiler) {
-	word_t inst_pos  = 0;
-	bool   has_entry = false;
+				break;
 
-	for (p_compiler->i = 0; p_compiler->i < p_compiler->tokens.count; ++ p_compiler->i) {
-		p_compiler->token = LIST_AT(token_t, &p_compiler->tokens, p_compiler->i);
-
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_INST: ++ inst_pos; break;
-		case TOKEN_TYPE_LABEL:
-			{
-				if (strcmp(PROGRAM_ENTRY_LABEL, p_compiler->token->data) == 0) {
-					has_entry = true;
-					p_compiler->entry_point = inst_pos;
-				}
-
-				label_t label = {.name = p_compiler->token->data, .inst_pos = inst_pos};
-				list_add(&p_compiler->labels, &label);
+			default: INTERNAL_BUG;
 			}
-
-			break;
-
-		default: break;
 		}
+
+		break;
+
+	case NODE_TYPE_STR:
+		{
+			char *data = p_compiler->node->left->tok->data;
+
+			/* use <= to also include the null terminator */
+			for (size_t i = 0; i <= strlen(data); ++ i) {
+				for (size_t j = 8; j < p_compiler->node->size; j += j)
+					LIST_PUSH(uint8_t, &p_compiler->data, 0);
+
+				LIST_PUSH(uint8_t, &p_compiler->data, (uint8_t)data[i]);
+			}
+		}
+
+		break;
+
+	default: INTERNAL_BUG; /* the parser should not allow any unexpected tokens through */
 	}
 
-	if (!has_entry)
-		fatal("Program has no entry point");
+	list_push(&p_compiler->data_consts, &data_const);
 }
 
-void compiler_main(compiler_t *p_compiler) {
-	for (p_compiler->i = 0; p_compiler->i < p_compiler->tokens.count; ++ p_compiler->i) {
-		p_compiler->token = LIST_AT(token_t, &p_compiler->tokens, p_compiler->i);
+void compiler_compile_inst(compiler_t *p_compiler) {
+	size_t argc = 0;
+	if (p_compiler->node->right != NULL)
+		argc = 1;
 
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_INST:    compiler_inst(p_compiler); break;
-		case TOKEN_TYPE_KEYWORD: assert(0 && "'data' keyword not implemented");
+	if (p_compiler->node->left != NULL) {
+		argc = 2;
 
-		case TOKEN_TYPE_END:
-		case TOKEN_TYPE_LABEL: break;
-
-		case TOKEN_TYPE_ID:
-			compiler_error(p_compiler, "Undefined identifier '%s'", p_compiler->token->data);
-
-			break;
-
-		default: compiler_error(p_compiler, "Unexpected token '%s'", p_compiler->token->data);
-		}
+		if (p_compiler->node->right == NULL)
+			INTERNAL_BUG;
 	}
-}
 
-void compiler_inst(compiler_t *p_compiler) {
-	for (size_t i = 0; i < IMPLEMENTED_INSTS; ++ i) {
-		if (strcmp(g_insts_map[i].name, p_compiler->token->data) == 0) {
-			size_t j = p_compiler->i + 1;
-			while (LIST_AT(token_t, &p_compiler->tokens, j)->type != TOKEN_TYPE_END)
-				++ j;
+	for (size_t i = 0; i < SIZE_OF(g_inst_func_map); ++ i) {
+		if (g_inst_func_map[i].key == p_compiler->node->tok->type) {
+			LIST_PUSH(inst_t, &p_compiler->insts, g_inst_func_map[i].func(p_compiler, argc));
 
-			g_insts_map[i].func(p_compiler, j - p_compiler->i - 1);
-
-			while (p_compiler->token->type != TOKEN_TYPE_END)
-				compiler_next_token(p_compiler);
-
-			break;
+			return;
 		}
 	}
 }
 
-void compiler_macro_definition(compiler_t *p_compiler) {
-	macro_t macro = {
-		.line = p_compiler->token->line,
-		.row  = p_compiler->token->row,
-		.col  = p_compiler->token->col
+void compiler_compile_label(compiler_t *p_compiler) {
+	label_t label = {
+		.name = copy_str(p_compiler->node->tok->data),
+		.addr = p_compiler->insts.count
 	};
 
-	list_init(&macro.args,   sizeof(char*));
-	list_init(&macro.tokens, sizeof(token_t));
+	list_push(&p_compiler->labels, &label);
+}
 
-	token_t *macro_declaration   = p_compiler->token;
-	size_t   macro_declaration_i = p_compiler->i;
+inst_t compiler_compile_inst_none(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "none";
+	inst_t inst = {.opcode = OPCODE_NONE};
 
-	compiler_next_token(p_compiler);
-	if (p_compiler->token->type != TOKEN_TYPE_ID) {
-		if (p_compiler->token->type == TOKEN_TYPE_INST)
-			compiler_error_fatal(p_compiler, "Expected macro identifier, got %s",
-			                     token_type_to_str(p_compiler->token));
+	if (p_argc != 2) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
 
-		return;
-	} else
-		macro.name = p_compiler->token->data;
+		aborted();
+	}
 
-	compiler_next_token(p_compiler);
-	if (p_compiler->token->type == TOKEN_TYPE_END || p_compiler->token->type == TOKEN_TYPE_LPAREN) {
-		if (p_compiler->token->type == TOKEN_TYPE_LPAREN) {
-			compiler_next_token(p_compiler);
+	return inst;
+}
 
-			while (p_compiler->token->type != TOKEN_TYPE_RPAREN) {
-				if (p_compiler->token->type == TOKEN_TYPE_END)
-					compiler_error_fatal(p_compiler, "Argument list not ended");
-				else if (p_compiler->token->type != TOKEN_TYPE_ID)
-					compiler_error_fatal(p_compiler, "Expected token type identifier, got %s",
-					                     token_type_to_str(p_compiler->token));
+inst_t compiler_compile_inst_move(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "move";
+	inst_t inst = {0};
 
-				list_add(&macro.args, &p_compiler->token->data);
+	if (p_argc != 2) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
 
-				compiler_next_token(p_compiler);
-			}
+		aborted();
+	}
 
-			if (macro.args.count == 0)
-				compiler_error_fatal(p_compiler, "Empty argument lists are forbidden");
+	inst.reg = compiler_get_reg_arg(p_compiler, p_compiler->node->left, name);
 
-			compiler_next_token(p_compiler);
-			if (p_compiler->token->type != TOKEN_TYPE_END)
-				compiler_error_fatal(p_compiler, "Expected statement end, got %s",
-				                     token_type_to_str(p_compiler->token));
-		}
-
-		compiler_next_token(p_compiler);
-
-		while (true) {
-			if (p_compiler->token->type == TOKEN_TYPE_KEYWORD) {
-				if (strcmp("end", p_compiler->token->data) == 0)
-					break;
-			}
-
-			list_add(&macro.tokens, p_compiler->token);
-
-			++ p_compiler->i;
-			if (p_compiler->i >= p_compiler->tokens.count)
-				compiler_error_at_prev(p_compiler, macro_declaration,
-				                       "Macro definition not ended");
-
-			-- p_compiler->i;
-			compiler_next_token(p_compiler);
-		}
-
-		list_remove(&p_compiler->tokens, macro_declaration_i,
-		            macro.tokens.count + 4 + (macro.args.count > 0? macro.args.count + 2 : 0));
-
-		p_compiler->i = macro_declaration_i;
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->right, name);
+	if (arg.is_reg) {
+		inst.data   = arg.value.reg;
+		inst.opcode = OPCODE_MOVE_R;
 	} else {
-		while (p_compiler->token->type != TOKEN_TYPE_END) {
-			list_add(&macro.tokens, p_compiler->token);
-
-			++ p_compiler->i;
-			assert(p_compiler->i < p_compiler->tokens.count && "This should probably never show");
-
-			-- p_compiler->i;
-			compiler_next_token(p_compiler);
-		}
-
-		list_remove(&p_compiler->tokens, macro_declaration_i, macro.tokens.count + 3);
-		p_compiler->i -= macro.tokens.count + 3;
+		inst.data   = arg.value.num;
+		inst.opcode = OPCODE_MOVE;
 	}
 
-	if (macro.tokens.count == 0)
-		compiler_error(p_compiler, "Empty macros are forbidden");
-
-	list_add(&p_compiler->macros, &macro);
+	return inst;
 }
 
-void compiler_expand_macro(compiler_t *p_compiler) {
-	for (size_t i = 0; i < p_compiler->macros.count; ++ i) {
-		macro_t *macro = LIST_AT(macro_t, &p_compiler->macros, i);
+inst_t compiler_compile_inst_write(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "write";
+	inst_t inst = {0};
 
-		if (strcmp(macro->name, p_compiler->token->data) == 0) {
-			for (size_t i = 0; i < macro->tokens.count; ++ i) {
-				token_t *token = LIST_AT(token_t, &macro->tokens, i);
+	if (p_argc != 2) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
 
-				token->line = p_compiler->token->line;
-				token->row  = p_compiler->token->row;
-				token->col  = p_compiler->token->col;
-			}
+		aborted();
+	}
 
-			list_t args;
-			list_init(&args, sizeof(token_t));
+	inst.reg = compiler_get_reg_arg(p_compiler, p_compiler->node->left, name);
 
-			size_t prev_i = p_compiler->i;
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->right, name);
+	if (arg.is_reg) {
+		inst.data = arg.value.reg;
 
-			compiler_next_token(p_compiler);
-			if (p_compiler->token->type == TOKEN_TYPE_LPAREN) {
-				compiler_next_token(p_compiler);
+		switch (p_compiler->node->size) {
+		case 8:  inst.opcode = OPCODE_WRITE_R_8;  break;
+		case 16: inst.opcode = OPCODE_WRITE_R_16; break;
+		case 32: inst.opcode = OPCODE_WRITE_R_32; break;
+		case 64: inst.opcode = OPCODE_WRITE_R_64; break;
 
-				while (p_compiler->token->type != TOKEN_TYPE_RPAREN) {
-					if (p_compiler->token->type == TOKEN_TYPE_END)
-						compiler_error_fatal(p_compiler, "Argument list not ended");
+		default: INTERNAL_BUG;
+		}
+	} else {
+		inst.data = arg.value.num;
 
-					list_add(&args, p_compiler->token);
+		switch (p_compiler->node->size) {
+		case 8:  inst.opcode = OPCODE_WRITE_8;  break;
+		case 16: inst.opcode = OPCODE_WRITE_16; break;
+		case 32: inst.opcode = OPCODE_WRITE_32; break;
+		case 64: inst.opcode = OPCODE_WRITE_64; break;
 
-					compiler_next_token(p_compiler);
-				}
-
-				if (args.count == 0)
-					compiler_error_fatal(p_compiler, "Empty argument lists are forbidden");
-
-				if (macro->args.count != args.count)
-					compiler_error_fatal(p_compiler,
-					                     "Macro '%s' expected %li arguments, but got %li",
-					                     macro->name, (long)macro->args.count, (long)args.count);
-			} else {
-				compiler_prev_token(p_compiler);
-
-				if (macro->args.count != 0)
-					compiler_error_fatal(p_compiler, "Macro '%s' expects %li arguments",
-					                     macro->name, macro->args.count);
-			}
-
-			p_compiler->i = prev_i;
-
-			list_remove(&p_compiler->tokens, p_compiler->i,
-			            1 + (args.count > 0? args.count + 2 : 0));
-
-			list_insert(&p_compiler->tokens, p_compiler->i,
-			            macro->tokens.buf, macro->tokens.count);
-
-			if (macro->args.count > 0) {
-				for (size_t i = p_compiler->i; i < p_compiler->i + macro->tokens.count; ++ i) {
-					token_t *token = LIST_AT(token_t, &p_compiler->tokens, i);
-
-					if (token->type == TOKEN_TYPE_ID) {
-						bool   found   = false;
-						size_t arg_idx = 0;
-						for (; arg_idx < macro->args.count; ++ arg_idx) {
-							char *arg_name = *LIST_AT(char*, &macro->args, arg_idx);
-							if (strcmp(arg_name, token->data) == 0) {
-								found = true;
-
-								break;
-							}
-						}
-
-						if (found)
-							*token = *LIST_AT(token_t, &args, arg_idx);
-					}
-				}
-			}
-
-			break;
+		default: INTERNAL_BUG;
 		}
 	}
+
+	return inst;
 }
 
-void compiler_next_token(compiler_t *p_compiler) {
-	++ p_compiler->i;
+inst_t compiler_compile_inst_read(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "read";
+	inst_t inst = {0};
 
-	if (p_compiler->i >= p_compiler->tokens.count)
-		compiler_error_fatal(p_compiler, "Unexpected end of file");
-	else
-		p_compiler->token = LIST_AT(token_t, &p_compiler->tokens, p_compiler->i);
-}
+	if (p_argc != 2) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
 
-void compiler_prev_token(compiler_t *p_compiler) {
-	assert(p_compiler->i > 0 && "This should never fail");
-
-	-- p_compiler->i;
-	p_compiler->token = LIST_AT(token_t, &p_compiler->tokens, p_compiler->i);
-}
-
-void compiler_push_inst(compiler_t *p_compiler, opcode_t p_opcode, reg_t p_reg, word_t p_data) {
-	inst_t inst = {.opcode = p_opcode, .reg = p_reg, .data = p_data};
-
-	list_add(&p_compiler->insts, &inst);
-}
-
-reg_t compiler_token_to_reg(compiler_t *p_compiler) {
-	if (p_compiler->token->type != TOKEN_TYPE_REG)
-		assert(0 && "Token is not convertable to a register (this message should never show)");
-
-	for (size_t i = 0; i < IMPLEMENTED_REGS; ++ i) {
-		if (strcmp(g_regs[i], p_compiler->token->data) == 0)
-			return (reg_t)i;
+		aborted();
 	}
 
-	compiler_error(p_compiler, "Unknown register '%s'", p_compiler->token->data);
+	inst.reg = compiler_get_reg_arg(p_compiler, p_compiler->node->left, name);
 
-	return -1;
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->right, name);
+	if (arg.is_reg) {
+		inst.data = arg.value.reg;
+
+		switch (p_compiler->node->size) {
+		case 8:  inst.opcode = OPCODE_READ_R_8;  break;
+		case 16: inst.opcode = OPCODE_READ_R_16; break;
+		case 32: inst.opcode = OPCODE_READ_R_32; break;
+		case 64: inst.opcode = OPCODE_READ_R_64; break;
+
+		default: INTERNAL_BUG;
+		}
+	} else {
+		inst.data = arg.value.num;
+
+		switch (p_compiler->node->size) {
+		case 8:  inst.opcode = OPCODE_READ_8;  break;
+		case 16: inst.opcode = OPCODE_READ_16; break;
+		case 32: inst.opcode = OPCODE_READ_32; break;
+		case 64: inst.opcode = OPCODE_READ_64; break;
+
+		default: INTERNAL_BUG;
+		}
+	}
+
+	return inst;
 }
 
-word_t compiler_token_to_num(compiler_t *p_compiler) {
-	switch (p_compiler->token->type) {
-	case TOKEN_TYPE_ID:
+inst_t compiler_compile_inst_push(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "push";
+	inst_t inst = {0};
+
+	if (p_argc != 1) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->left, name);
+	if (arg.is_reg) {
+		inst.reg = arg.value.reg;
+
+		switch (p_compiler->node->size) {
+		case 8:  inst.opcode = OPCODE_PUSH_R_8;  break;
+		case 16: inst.opcode = OPCODE_PUSH_R_16; break;
+		case 32: inst.opcode = OPCODE_PUSH_R_32; break;
+		case 64: inst.opcode = OPCODE_PUSH_R_64; break;
+
+		default: INTERNAL_BUG;
+		}
+	} else {
+		inst.data = arg.value.num;
+
+		switch (p_compiler->node->size) {
+		case 8:  inst.opcode = OPCODE_PUSH_8;  break;
+		case 16: inst.opcode = OPCODE_PUSH_16; break;
+		case 32: inst.opcode = OPCODE_PUSH_32; break;
+		case 64: inst.opcode = OPCODE_PUSH_64; break;
+
+		default: INTERNAL_BUG;
+		}
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_pusha(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "pusha";
+	inst_t inst = {.opcode = OPCODE_PUSH_A};
+
+	if (p_argc != 0) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_pop(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "pop";
+	inst_t inst = {0};
+
+	if (p_argc == 0) {
+		switch (p_compiler->node->size) {
+		case 8:  inst.opcode = OPCODE_POP_8;  break;
+		case 16: inst.opcode = OPCODE_POP_16; break;
+		case 32: inst.opcode = OPCODE_POP_32; break;
+		case 64: inst.opcode = OPCODE_POP_64; break;
+
+		default: INTERNAL_BUG;
+		}
+	} else if (p_argc == 1) {
+		inst.reg = compiler_get_reg_arg(p_compiler, p_compiler->node->left, name);
+
+		switch (p_compiler->node->size) {
+		case 8:  inst.opcode = OPCODE_POP_R_8;  break;
+		case 16: inst.opcode = OPCODE_POP_R_16; break;
+		case 32: inst.opcode = OPCODE_POP_R_32; break;
+		case 64: inst.opcode = OPCODE_POP_R_64; break;
+
+		default: INTERNAL_BUG;
+		}
+	} else {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 1 or 0 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_popa(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "popa";
+	inst_t inst = {.opcode = OPCODE_POP_A};
+
+	if (p_argc != 0) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_eq(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "eq";
+	inst_t inst = {0};
+
+	if (p_argc != 2) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	inst.reg = compiler_get_reg_arg(p_compiler, p_compiler->node->left, name);
+
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->right, name);
+	if (arg.is_reg) {
+		inst.data   = arg.value.reg;
+		inst.opcode = OPCODE_EQ_R;
+	} else {
+		inst.data   = arg.value.num;
+		inst.opcode = OPCODE_EQ;
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_neq(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "neq";
+	inst_t inst = {0};
+
+	if (p_argc != 2) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	inst.reg = compiler_get_reg_arg(p_compiler, p_compiler->node->left, name);
+
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->right, name);
+	if (arg.is_reg) {
+		inst.data   = arg.value.reg;
+		inst.opcode = OPCODE_NEQ_R;
+	} else {
+		inst.data   = arg.value.num;
+		inst.opcode = OPCODE_NEQ;
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_gt(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "gt";
+	inst_t inst = {0};
+
+	if (p_argc != 2) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	inst.reg = compiler_get_reg_arg(p_compiler, p_compiler->node->left, name);
+
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->right, name);
+	if (arg.is_reg) {
+		inst.data   = arg.value.reg;
+		inst.opcode = OPCODE_GT_R;
+	} else {
+		inst.data   = arg.value.num;
+		inst.opcode = OPCODE_GT;
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_ge(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "ge";
+	inst_t inst = {0};
+
+	if (p_argc != 2) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	inst.reg = compiler_get_reg_arg(p_compiler, p_compiler->node->left, name);
+
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->right, name);
+	if (arg.is_reg) {
+		inst.data   = arg.value.reg;
+		inst.opcode = OPCODE_GE_R;
+	} else {
+		inst.data   = arg.value.num;
+		inst.opcode = OPCODE_GE;
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_lt(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "lt";
+	inst_t inst = {0};
+
+	if (p_argc != 2) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	inst.reg = compiler_get_reg_arg(p_compiler, p_compiler->node->left, name);
+
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->right, name);
+	if (arg.is_reg) {
+		inst.data   = arg.value.reg;
+		inst.opcode = OPCODE_LT_R;
+	} else {
+		inst.data   = arg.value.num;
+		inst.opcode = OPCODE_LT;
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_le(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "le";
+	inst_t inst = {0};
+
+	if (p_argc != 2) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	inst.reg = compiler_get_reg_arg(p_compiler, p_compiler->node->left, name);
+
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->right, name);
+	if (arg.is_reg) {
+		inst.data   = arg.value.reg;
+		inst.opcode = OPCODE_LE_R;
+	} else {
+		inst.data   = arg.value.num;
+		inst.opcode = OPCODE_LE;
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_jump(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "jump";
+	inst_t inst = {0};
+
+	if (p_argc != 1) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->left, name);
+	if (arg.is_reg) {
+		inst.reg    = arg.value.reg;
+		inst.opcode = OPCODE_JUMP_R;
+	} else {
+		inst.data   = arg.value.num;
+		inst.opcode = OPCODE_JUMP;
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_jumpt(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "jumpt";
+	inst_t inst = {0};
+
+	if (p_argc != 1) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->left, name);
+	if (arg.is_reg) {
+		inst.reg    = arg.value.reg;
+		inst.opcode = OPCODE_JUMP_T_R;
+	} else {
+		inst.data   = arg.value.num;
+		inst.opcode = OPCODE_JUMP_T;
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_jumpf(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "jumpf";
+	inst_t inst = {0};
+
+	if (p_argc != 1) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->left, name);
+	if (arg.is_reg) {
+		inst.reg    = arg.value.reg;
+		inst.opcode = OPCODE_JUMP_F_R;
+	} else {
+		inst.data   = arg.value.num;
+		inst.opcode = OPCODE_JUMP_F;
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_add(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "add";
+	inst_t inst = {0};
+
+	if (p_argc != 2) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	inst.reg = compiler_get_reg_arg(p_compiler, p_compiler->node->left, name);
+
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->right, name);
+	if (arg.is_reg) {
+		inst.data   = arg.value.reg;
+		inst.opcode = OPCODE_ADD_R;
+	} else {
+		inst.data   = arg.value.num;
+		inst.opcode = OPCODE_ADD;
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_inc(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "inc";
+	inst_t inst = {.opcode = OPCODE_INC};
+
+	if (p_argc != 1) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	inst.reg = compiler_get_reg_arg(p_compiler, p_compiler->node->left, name);
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_sub(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "sub";
+	inst_t inst = {0};
+
+	if (p_argc != 2) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	inst.reg = compiler_get_reg_arg(p_compiler, p_compiler->node->left, name);
+
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->right, name);
+	if (arg.is_reg) {
+		inst.data   = arg.value.reg;
+		inst.opcode = OPCODE_SUB_R;
+	} else {
+		inst.data   = arg.value.num;
+		inst.opcode = OPCODE_SUB;
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_dec(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "dec";
+	inst_t inst = {.opcode = OPCODE_DEC};
+
+	if (p_argc != 1) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	inst.reg = compiler_get_reg_arg(p_compiler, p_compiler->node->left, name);
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_mult(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "mult";
+	inst_t inst = {0};
+
+	if (p_argc != 2) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	inst.reg = compiler_get_reg_arg(p_compiler, p_compiler->node->left, name);
+
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->right, name);
+	if (arg.is_reg) {
+		inst.data   = arg.value.reg;
+		inst.opcode = OPCODE_MULT_R;
+	} else {
+		inst.data   = arg.value.num;
+		inst.opcode = OPCODE_MULT;
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_div(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "div";
+	inst_t inst = {0};
+
+	if (p_argc != 2) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	inst.reg = compiler_get_reg_arg(p_compiler, p_compiler->node->left, name);
+
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->right, name);
+	if (arg.is_reg) {
+		inst.data   = arg.value.reg;
+		inst.opcode = OPCODE_DIV_R;
+	} else {
+		inst.data   = arg.value.num;
+		inst.opcode = OPCODE_DIV;
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_mod(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "mod";
+	inst_t inst = {0};
+
+	if (p_argc != 2) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	inst.reg = compiler_get_reg_arg(p_compiler, p_compiler->node->left, name);
+
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->right, name);
+	if (arg.is_reg) {
+		inst.data   = arg.value.reg;
+		inst.opcode = OPCODE_MOD_R;
+	} else {
+		inst.data   = arg.value.num;
+		inst.opcode = OPCODE_MOD;
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_rshift(compiler_t *p_compiler, size_t p_argc) {
+	(void)p_compiler; (void)p_argc;
+
+	assert(0 && "Instruction unimplemented");
+}
+
+inst_t compiler_compile_inst_lshift(compiler_t *p_compiler, size_t p_argc) {
+	(void)p_compiler; (void)p_argc;
+
+	assert(0 && "Instruction unimplemented");
+}
+
+inst_t compiler_compile_inst_and(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "and";
+	inst_t inst = {.opcode = OPCODE_AND};
+
+	if (p_argc != 2) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	inst.reg  = compiler_get_reg_arg(p_compiler, p_compiler->node->left, name);
+	inst.data = compiler_get_reg_arg(p_compiler, p_compiler->node->right, name);
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_or(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "or";
+	inst_t inst = {.opcode = OPCODE_OR};
+
+	if (p_argc != 2) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	inst.reg  = compiler_get_reg_arg(p_compiler, p_compiler->node->left, name);
+	inst.data = compiler_get_reg_arg(p_compiler, p_compiler->node->right, name);
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_not(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "not";
+	inst_t inst = {.opcode = OPCODE_NOT};
+
+	if (p_argc != 1) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	inst.reg = compiler_get_reg_arg(p_compiler, p_compiler->node->left, name);
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_bitand(compiler_t *p_compiler, size_t p_argc) {
+	(void)p_compiler; (void)p_argc;
+
+	assert(0 && "Instruction unimplemented");
+}
+
+inst_t compiler_compile_inst_bitor(compiler_t *p_compiler, size_t p_argc) {
+	(void)p_compiler; (void)p_argc;
+
+	assert(0 && "Instruction unimplemented");
+}
+
+inst_t compiler_compile_inst_call(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "call";
+	inst_t inst = {0};
+
+	if (p_argc != 1) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->left, name);
+	if (arg.is_reg) {
+		inst.reg    = arg.value.reg;
+		inst.opcode = OPCODE_CALL_R;
+	} else {
+		inst.data   = arg.value.num;
+		inst.opcode = OPCODE_CALL;
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_callt(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "callt";
+	inst_t inst = {0};
+
+	if (p_argc != 1) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->left, name);
+	if (arg.is_reg) {
+		inst.reg    = arg.value.reg;
+		inst.opcode = OPCODE_CALL_T_R;
+	} else {
+		inst.data   = arg.value.num;
+		inst.opcode = OPCODE_CALL_T;
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_callf(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "callf";
+	inst_t inst = {0};
+
+	if (p_argc != 1) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->left, name);
+	if (arg.is_reg) {
+		inst.reg    = arg.value.reg;
+		inst.opcode = OPCODE_CALL_F_R;
+	} else {
+		inst.data   = arg.value.num;
+		inst.opcode = OPCODE_CALL_F;
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_ret(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "ret";
+	inst_t inst = {.opcode = OPCODE_RET};
+
+	if (p_argc != 0) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_syscall(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "syscall";
+	inst_t inst = {0};
+
+	if (p_argc != 1) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	arg_any_t arg = compiler_get_any_arg(p_compiler, p_compiler->node->left, name);
+	if (arg.is_reg) {
+		inst.reg    = arg.value.reg;
+		inst.opcode = OPCODE_SYSCALL_R;
+	} else {
+		inst.data   = arg.value.num;
+		inst.opcode = OPCODE_SYSCALL;
+	}
+
+	return inst;
+}
+
+inst_t compiler_compile_inst_halt(compiler_t *p_compiler, size_t p_argc) {
+	const char *name = "halt";
+	inst_t inst = {.opcode = OPCODE_HALT};
+
+	if (p_argc != 0) {
+		error(&p_compiler->node->tok->loc, QUOTES("%s")" expects 2 arguments, got %li",
+		      name, (long)p_argc);
+
+		aborted();
+	}
+
+	return inst;
+}
+
+word_t compiler_get_num_arg(compiler_t *p_compiler, node_t *p_node, const char *p_inst) {
+	switch (p_node->type) {
+	case NODE_TYPE_NUM: return p_node->data.num;
+	case NODE_TYPE_ID:
+		/* is the identifier a const? */
+		for (size_t i = 0; i < p_compiler->data_consts.count; ++ i) {
+			data_const_t *data_const = LIST_AT(data_const_t, &p_compiler->data_consts, i);
+
+			if (strcmp(data_const->name, p_node->tok->data) == 0)
+				return data_const->addr;
+		}
+
+		/* is the identifier a label? */
 		for (size_t i = 0; i < p_compiler->labels.count; ++ i) {
 			label_t *label = LIST_AT(label_t, &p_compiler->labels, i);
 
-			if (strcmp(label->name, p_compiler->token->data) == 0)
-				return label->inst_pos;
+			if (strcmp(label->name, p_node->tok->data) == 0)
+				return label->addr;
 		}
 
-		compiler_error(p_compiler, "Undefined identifier '%s'", p_compiler->token->data);
+		error(&p_node->tok->loc, "Identifier "QUOTES("%s")" not defined",
+		      p_node->tok->data);
 
-		return -1;
-
-	case TOKEN_TYPE_CHAR: return p_compiler->token->data[0];
-
-	case TOKEN_TYPE_HEX: case TOKEN_TYPE_DEC:
-		return strtol(p_compiler->token->data, NULL,
-		              p_compiler->token->type == TOKEN_TYPE_HEX? 16 : 10);
-
-	default: assert(0 && "Token is not convertable to a number (this message should never show)");
-	}
-}
-
-void compiler_inst_move(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 2) {
-		compiler_error(p_compiler, "'move' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG) {
-		reg_t reg = compiler_token_to_reg(p_compiler);
-
-		compiler_next_token(p_compiler);
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_REG:
-			compiler_push_inst(p_compiler, OPCODE_MOVE_R, reg, compiler_token_to_reg(p_compiler));
-
-			break;
-
-		case CASE_TOKEN_TYPE_NUM:
-			compiler_push_inst(p_compiler, OPCODE_MOVE, reg, compiler_token_to_num(p_compiler));
-
-			break;
-
-		default:
-			compiler_error(p_compiler, "'move' incorrect argument 2 type '%s'",
-			               token_type_to_str(p_compiler->token));
-		}
-	} else
-		compiler_error(p_compiler, "'move' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_write64(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 2) {
-		compiler_error(p_compiler, "'write64' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG) {
-		reg_t reg = compiler_token_to_reg(p_compiler);
-
-		compiler_next_token(p_compiler);
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_REG:
-			compiler_push_inst(p_compiler, OPCODE_WRITE_R_64,
-			                   reg, compiler_token_to_reg(p_compiler));
-
-			break;
-
-		case CASE_TOKEN_TYPE_NUM:
-			compiler_push_inst(p_compiler, OPCODE_WRITE_64, reg, compiler_token_to_num(p_compiler));
-
-			break;
-
-		default:
-			compiler_error(p_compiler, "'write64' incorrect argument 2 type '%s'",
-			               token_type_to_str(p_compiler->token));
-		}
-	} else
-		compiler_error(p_compiler, "'write64' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_write32(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 2) {
-		compiler_error(p_compiler, "'write32' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG) {
-		reg_t reg = compiler_token_to_reg(p_compiler);
-
-		compiler_next_token(p_compiler);
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_REG:
-			compiler_push_inst(p_compiler, OPCODE_WRITE_R_32,
-			                   reg, compiler_token_to_reg(p_compiler));
-
-			break;
-
-		case CASE_TOKEN_TYPE_NUM:
-			compiler_push_inst(p_compiler, OPCODE_WRITE_32, reg, compiler_token_to_num(p_compiler));
-
-			break;
-
-		default:
-			compiler_error(p_compiler, "'write32' incorrect argument 2 type '%s'",
-			               token_type_to_str(p_compiler->token));
-		}
-	} else
-		compiler_error(p_compiler, "'write32' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_write16(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 2) {
-		compiler_error(p_compiler, "'write16' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG) {
-		reg_t reg = compiler_token_to_reg(p_compiler);
-
-		compiler_next_token(p_compiler);
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_REG:
-			compiler_push_inst(p_compiler, OPCODE_WRITE_R_16,
-			                   reg, compiler_token_to_reg(p_compiler));
-
-			break;
-
-		case CASE_TOKEN_TYPE_NUM:
-			compiler_push_inst(p_compiler, OPCODE_WRITE_16, reg, compiler_token_to_num(p_compiler));
-
-			break;
-
-		default:
-			compiler_error(p_compiler, "'write16' incorrect argument 2 type '%s'",
-			               token_type_to_str(p_compiler->token));
-		}
-	} else
-		compiler_error(p_compiler, "'write16' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_write8(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 2) {
-		compiler_error(p_compiler, "'write8' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG) {
-		reg_t reg = compiler_token_to_reg(p_compiler);
-
-		compiler_next_token(p_compiler);
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_REG:
-			compiler_push_inst(p_compiler, OPCODE_WRITE_R_8,
-			                   reg, compiler_token_to_reg(p_compiler));
-
-			break;
-
-		case CASE_TOKEN_TYPE_NUM:
-			compiler_push_inst(p_compiler, OPCODE_WRITE_8, reg, compiler_token_to_num(p_compiler));
-
-			break;
-
-		default:
-			compiler_error(p_compiler, "'write8' incorrect argument 2 type '%s'",
-			               token_type_to_str(p_compiler->token));
-		}
-	} else
-		compiler_error(p_compiler, "'write8' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_read64(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 2) {
-		compiler_error(p_compiler, "'read64' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG) {
-		reg_t reg = compiler_token_to_reg(p_compiler);
-
-		compiler_next_token(p_compiler);
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_REG:
-			compiler_push_inst(p_compiler, OPCODE_READ_R_64,
-			                   reg, compiler_token_to_reg(p_compiler));
-
-			break;
-
-		case CASE_TOKEN_TYPE_NUM:
-			compiler_push_inst(p_compiler, OPCODE_READ_64, reg, compiler_token_to_num(p_compiler));
-
-			break;
-
-		default:
-			compiler_error(p_compiler, "'read64' incorrect argument 2 type '%s'",
-			               token_type_to_str(p_compiler->token));
-		}
-	} else
-		compiler_error(p_compiler, "'read64' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_read32(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 2) {
-		compiler_error(p_compiler, "'read32' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG) {
-		reg_t reg = compiler_token_to_reg(p_compiler);
-
-		compiler_next_token(p_compiler);
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_REG:
-			compiler_push_inst(p_compiler, OPCODE_READ_R_32,
-			                   reg, compiler_token_to_reg(p_compiler));
-
-			break;
-
-		case CASE_TOKEN_TYPE_NUM:
-			compiler_push_inst(p_compiler, OPCODE_READ_32, reg, compiler_token_to_num(p_compiler));
-
-			break;
-
-		default:
-			compiler_error(p_compiler, "'read32' incorrect argument 2 type '%s'",
-			               token_type_to_str(p_compiler->token));
-		}
-	} else
-		compiler_error(p_compiler, "'read32' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_read16(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 2) {
-		compiler_error(p_compiler, "'read16' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG) {
-		reg_t reg = compiler_token_to_reg(p_compiler);
-
-		compiler_next_token(p_compiler);
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_REG:
-			compiler_push_inst(p_compiler, OPCODE_READ_R_16,
-			                   reg, compiler_token_to_reg(p_compiler));
-
-			break;
-
-		case CASE_TOKEN_TYPE_NUM:
-			compiler_push_inst(p_compiler, OPCODE_READ_16, reg, compiler_token_to_num(p_compiler));
-
-			break;
-
-		default:
-			compiler_error(p_compiler, "'read16' incorrect argument 2 type '%s'",
-			               token_type_to_str(p_compiler->token));
-		}
-	} else
-		compiler_error(p_compiler, "'read16' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_read8(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 2) {
-		compiler_error(p_compiler, "'read8' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG) {
-		reg_t reg = compiler_token_to_reg(p_compiler);
-
-		compiler_next_token(p_compiler);
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_REG:
-			compiler_push_inst(p_compiler, OPCODE_READ_R_8, reg, compiler_token_to_reg(p_compiler));
-
-			break;
-
-		case CASE_TOKEN_TYPE_NUM:
-			compiler_push_inst(p_compiler, OPCODE_READ_8, reg, compiler_token_to_num(p_compiler));
-
-			break;
-
-		default:
-			compiler_error(p_compiler, "'read8' incorrect argument 2 type '%s'",
-			               token_type_to_str(p_compiler->token));
-		}
-	} else
-		compiler_error(p_compiler, "'read8' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_push64(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 1) {
-		compiler_error(p_compiler, "'push64' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	switch (p_compiler->token->type) {
-	case TOKEN_TYPE_REG:
-		compiler_push_inst(p_compiler, OPCODE_PUSH_R_64, compiler_token_to_reg(p_compiler), 0);
-
-		break;
-
-	case CASE_TOKEN_TYPE_NUM:
-		compiler_push_inst(p_compiler, OPCODE_PUSH_64, 0, compiler_token_to_num(p_compiler));
+		aborted();
 
 		break;
 
 	default:
-		compiler_error(p_compiler, "'push64' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
+		error(&p_node->tok->loc, QUOTES("%s")" arg expected to be "QUOTES("%s")", got "QUOTES("%S"),
+		      p_inst, node_type_to_str(NODE_TYPE_NUM), node_type_to_str(p_node->type));
+
+		aborted();
 	}
+
+	return 0; /* for the compiler so it will not complain */
 }
 
-void compiler_inst_push32(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 1) {
-		compiler_error(p_compiler, "'push32' expects 2 arguments, got %li", (long)p_argc);
+reg_t compiler_get_reg_arg(compiler_t *p_compiler, node_t *p_node, const char *p_inst) {
+	(void)p_compiler; /* we dont use p_compiler, but we still require it for consistency :) */
 
-		return;
-	} else
-		compiler_next_token(p_compiler);
+	switch (p_node->type) {
+	case NODE_TYPE_REG: return (reg_t)p_node->data.num; break;
 
-	switch (p_compiler->token->type) {
-	case TOKEN_TYPE_REG:
-		compiler_push_inst(p_compiler, OPCODE_PUSH_R_32, compiler_token_to_reg(p_compiler), 0);
+	default:
+		error(&p_node->tok->loc, QUOTES("%s")" arg expected to be "QUOTES("%s")", got "QUOTES("%s"),
+		      p_inst, node_type_to_str(NODE_TYPE_REG), node_type_to_str(p_node->type));
+
+		aborted();
+	}
+
+	return 0;
+}
+
+arg_any_t compiler_get_any_arg(compiler_t *p_compiler, node_t *p_node, const char *p_inst) {
+	(void)p_compiler;
+
+	arg_any_t arg = {0};
+
+	switch (p_node->type) {
+	case NODE_TYPE_REG:
+		arg.is_reg    = true;
+		arg.value.reg = compiler_get_reg_arg(p_compiler, p_node, p_inst);
 
 		break;
 
-	case CASE_TOKEN_TYPE_NUM:
-		compiler_push_inst(p_compiler, OPCODE_PUSH_32, 0, compiler_token_to_num(p_compiler));
+	case NODE_TYPE_NUM: case NODE_TYPE_ID:
+		arg.is_reg    = false;
+		arg.value.num = compiler_get_num_arg(p_compiler, p_node, p_inst);
 
 		break;
 
 	default:
-		compiler_error(p_compiler, "'push32' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-	}
-}
+		error(&p_node->tok->loc, QUOTES("%s")" arg expected to be "QUOTES("%s")
+		      " or "QUOTES("%s")", got "QUOTES("%S"),
+		      p_inst, node_type_to_str(NODE_TYPE_NUM), node_type_to_str(NODE_TYPE_REG),
+		      node_type_to_str(p_node->type));
 
-void compiler_inst_push16(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 1) {
-		compiler_error(p_compiler, "'push16' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	switch (p_compiler->token->type) {
-	case TOKEN_TYPE_REG:
-		compiler_push_inst(p_compiler, OPCODE_PUSH_R_16, compiler_token_to_reg(p_compiler), 0);
-
-		break;
-
-	case CASE_TOKEN_TYPE_NUM:
-		compiler_push_inst(p_compiler, OPCODE_PUSH_16, 0, compiler_token_to_num(p_compiler));
-
-		break;
-
-	default:
-		compiler_error(p_compiler, "'push16' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-	}
-}
-
-void compiler_inst_push8(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 1) {
-		compiler_error(p_compiler, "'push8' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	switch (p_compiler->token->type) {
-	case TOKEN_TYPE_REG:
-		compiler_push_inst(p_compiler, OPCODE_PUSH_R_8, compiler_token_to_reg(p_compiler), 0);
-
-		break;
-
-	case CASE_TOKEN_TYPE_NUM:
-		compiler_push_inst(p_compiler, OPCODE_PUSH_8, 0, compiler_token_to_num(p_compiler));
-
-		break;
-
-	default:
-		compiler_error(p_compiler, "'push8' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-	}
-}
-
-void compiler_inst_pusha(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 0) {
-		compiler_error(p_compiler, "'pusha' expects no arguments, got %li", (long)p_argc);
-
-		return;
+		aborted();
 	}
 
-	compiler_push_inst(p_compiler, OPCODE_PUSH_A, 0, 0);
+	return arg;
 }
 
-void compiler_inst_pop64(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc > 1) {
-		compiler_error(p_compiler, "'pop64' expects 1 or no arguments, got %li", (long)p_argc);
-
-		return;
-	}
-
-	if (p_argc == 0)
-		compiler_push_inst(p_compiler, OPCODE_POP_64, 0, 0);
-	else {
-		compiler_next_token(p_compiler);
-
-		if (p_compiler->token->type == TOKEN_TYPE_REG)
-			compiler_push_inst(p_compiler, OPCODE_POP_R_64, compiler_token_to_reg(p_compiler), 0);
-		else
-			compiler_error(p_compiler, "'pop64' incorrect argument 1 type '%s'",
-			               token_type_to_str(p_compiler->token));
-	}
+void label_free(label_t *p_label) {
+	free(p_label->name);
 }
 
-void compiler_inst_pop32(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc > 1) {
-		compiler_error(p_compiler, "'pop32' expects 1 or no arguments, got %li", (long)p_argc);
-
-		return;
-	}
-
-	if (p_argc == 0)
-		compiler_push_inst(p_compiler, OPCODE_POP_32, 0, 0);
-	else {
-		compiler_next_token(p_compiler);
-
-		if (p_compiler->token->type == TOKEN_TYPE_REG)
-			compiler_push_inst(p_compiler, OPCODE_POP_R_32, compiler_token_to_reg(p_compiler), 0);
-		else
-			compiler_error(p_compiler, "'pop32' incorrect argument 1 type '%s'",
-			               token_type_to_str(p_compiler->token));
-	}
-}
-
-void compiler_inst_pop16(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc > 1) {
-		compiler_error(p_compiler, "'pop16' expects 1 or no arguments, got %li", (long)p_argc);
-
-		return;
-	}
-
-	if (p_argc == 0)
-		compiler_push_inst(p_compiler, OPCODE_POP_16, 0, 0);
-	else {
-		compiler_next_token(p_compiler);
-
-		if (p_compiler->token->type == TOKEN_TYPE_REG)
-			compiler_push_inst(p_compiler, OPCODE_POP_R_16, compiler_token_to_reg(p_compiler), 0);
-		else
-			compiler_error(p_compiler, "'pop16' incorrect argument 1 type '%s'",
-			               token_type_to_str(p_compiler->token));
-	}
-}
-
-void compiler_inst_pop8(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc > 1) {
-		compiler_error(p_compiler, "'pop8' expects 1 or no arguments, got %li", (long)p_argc);
-
-		return;
-	}
-
-	if (p_argc == 0)
-		compiler_push_inst(p_compiler, OPCODE_POP_8, 0, 0);
-	else {
-		compiler_next_token(p_compiler);
-
-		if (p_compiler->token->type == TOKEN_TYPE_REG)
-			compiler_push_inst(p_compiler, OPCODE_POP_R_8, compiler_token_to_reg(p_compiler), 0);
-		else
-			compiler_error(p_compiler, "'pop8' incorrect argument 1 type '%s'",
-			               token_type_to_str(p_compiler->token));
-	}
-}
-
-void compiler_inst_popa(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 0) {
-		compiler_error(p_compiler, "'popa' expects no arguments, got %li", (long)p_argc);
-
-		return;
-	}
-
-	compiler_push_inst(p_compiler, OPCODE_POP_A, 0, 0);
-}
-
-void compiler_inst_eq(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 2) {
-		compiler_error(p_compiler, "'eq' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG) {
-		reg_t reg = compiler_token_to_reg(p_compiler);
-
-		compiler_next_token(p_compiler);
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_REG:
-			compiler_push_inst(p_compiler, OPCODE_EQ_R, reg, compiler_token_to_reg(p_compiler));
-
-			break;
-
-		case CASE_TOKEN_TYPE_NUM:
-			compiler_push_inst(p_compiler, OPCODE_EQ, reg, compiler_token_to_num(p_compiler));
-
-			break;
-
-		default:
-			compiler_error(p_compiler, "'eq' incorrect argument 2 type '%s'",
-			               token_type_to_str(p_compiler->token));
-		}
-	} else
-		compiler_error(p_compiler, "'eq' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_neq(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 2) {
-		compiler_error(p_compiler, "'neq' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG) {
-		reg_t reg = compiler_token_to_reg(p_compiler);
-
-		compiler_next_token(p_compiler);
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_REG:
-			compiler_push_inst(p_compiler, OPCODE_NEQ_R, reg, compiler_token_to_reg(p_compiler));
-
-			break;
-
-		case CASE_TOKEN_TYPE_NUM:
-			compiler_push_inst(p_compiler, OPCODE_NEQ, reg, compiler_token_to_num(p_compiler));
-
-			break;
-
-		default:
-			compiler_error(p_compiler, "'neq' incorrect argument 2 type '%s'",
-			               token_type_to_str(p_compiler->token));
-		}
-	} else
-		compiler_error(p_compiler, "'neq' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_gt(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 2) {
-		compiler_error(p_compiler, "'gt' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG) {
-		reg_t reg = compiler_token_to_reg(p_compiler);
-
-		compiler_next_token(p_compiler);
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_REG:
-			compiler_push_inst(p_compiler, OPCODE_GT_R, reg, compiler_token_to_reg(p_compiler));
-
-			break;
-
-		case CASE_TOKEN_TYPE_NUM:
-			compiler_push_inst(p_compiler, OPCODE_GT, reg, compiler_token_to_num(p_compiler));
-
-			break;
-
-		default:
-			compiler_error(p_compiler, "'gt' incorrect argument 2 type '%s'",
-			               token_type_to_str(p_compiler->token));
-		}
-	} else
-		compiler_error(p_compiler, "'gt' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_ge(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 2) {
-		compiler_error(p_compiler, "'ge' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG) {
-		reg_t reg = compiler_token_to_reg(p_compiler);
-
-		compiler_next_token(p_compiler);
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_REG:
-			compiler_push_inst(p_compiler, OPCODE_GE_R, reg, compiler_token_to_reg(p_compiler));
-
-			break;
-
-		case CASE_TOKEN_TYPE_NUM:
-			compiler_push_inst(p_compiler, OPCODE_GE, reg, compiler_token_to_num(p_compiler));
-
-			break;
-
-		default:
-			compiler_error(p_compiler, "'ge' incorrect argument 2 type '%s'",
-			               token_type_to_str(p_compiler->token));
-		}
-	} else
-		compiler_error(p_compiler, "'ge' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_lt(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 2) {
-		compiler_error(p_compiler, "'lt' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG) {
-		reg_t reg = compiler_token_to_reg(p_compiler);
-
-		compiler_next_token(p_compiler);
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_REG:
-			compiler_push_inst(p_compiler, OPCODE_LT_R, reg, compiler_token_to_reg(p_compiler));
-
-			break;
-
-		case CASE_TOKEN_TYPE_NUM:
-			compiler_push_inst(p_compiler, OPCODE_LT, reg, compiler_token_to_num(p_compiler));
-
-			break;
-
-		default:
-			compiler_error(p_compiler, "'lt' incorrect argument 2 type '%s'",
-			               token_type_to_str(p_compiler->token));
-		}
-	} else
-		compiler_error(p_compiler, "'lt' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_le(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 2) {
-		compiler_error(p_compiler, "'le' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG) {
-		reg_t reg = compiler_token_to_reg(p_compiler);
-
-		compiler_next_token(p_compiler);
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_REG:
-			compiler_push_inst(p_compiler, OPCODE_LE_R, reg, compiler_token_to_reg(p_compiler));
-
-			break;
-
-		case CASE_TOKEN_TYPE_NUM:
-			compiler_push_inst(p_compiler, OPCODE_LE, reg, compiler_token_to_num(p_compiler));
-
-			break;
-
-		default:
-			compiler_error(p_compiler, "'le' incorrect argument 2 type '%s'",
-			               token_type_to_str(p_compiler->token));
-		}
-	} else
-		compiler_error(p_compiler, "'le' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_jump(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 1) {
-		compiler_error(p_compiler, "'jump' expects 1 argument, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	switch (p_compiler->token->type) {
-	case TOKEN_TYPE_REG:
-		compiler_push_inst(p_compiler, OPCODE_JUMP_R, compiler_token_to_reg(p_compiler), 0);
-
-		break;
-
-	case CASE_TOKEN_TYPE_NUM:
-		compiler_push_inst(p_compiler, OPCODE_JUMP, 0, compiler_token_to_num(p_compiler));
-
-		break;
-
-	default:
-		compiler_error(p_compiler, "'jump' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-	}
-}
-
-void compiler_inst_jumpt(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 1) {
-		compiler_error(p_compiler, "'jumpt' expects 1 argument, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	switch (p_compiler->token->type) {
-	case TOKEN_TYPE_REG:
-		compiler_push_inst(p_compiler, OPCODE_JUMP_T_R, compiler_token_to_reg(p_compiler), 0);
-
-		break;
-
-	case CASE_TOKEN_TYPE_NUM:
-		compiler_push_inst(p_compiler, OPCODE_JUMP_T, 0, compiler_token_to_num(p_compiler));
-
-		break;
-
-	default:
-		compiler_error(p_compiler, "'jumpt' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-	}
-}
-
-void compiler_inst_jumpf(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 1) {
-		compiler_error(p_compiler, "'jumpf' expects 1 argument, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	switch (p_compiler->token->type) {
-	case TOKEN_TYPE_REG:
-		compiler_push_inst(p_compiler, OPCODE_JUMP_F_R, compiler_token_to_reg(p_compiler), 0);
-
-		break;
-
-	case CASE_TOKEN_TYPE_NUM:
-		compiler_push_inst(p_compiler, OPCODE_JUMP_F, 0, compiler_token_to_num(p_compiler));
-
-		break;
-
-	default:
-		compiler_error(p_compiler, "'jumpf' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-	}
-}
-
-void compiler_inst_add(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 2) {
-		compiler_error(p_compiler, "'add' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG) {
-		reg_t reg = compiler_token_to_reg(p_compiler);
-
-		compiler_next_token(p_compiler);
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_REG:
-			compiler_push_inst(p_compiler, OPCODE_ADD_R, reg, compiler_token_to_reg(p_compiler));
-
-			break;
-
-		case CASE_TOKEN_TYPE_NUM:
-			compiler_push_inst(p_compiler, OPCODE_ADD, reg, compiler_token_to_num(p_compiler));
-
-			break;
-
-		default:
-			compiler_error(p_compiler, "'add' incorrect argument 2 type '%s'",
-			               token_type_to_str(p_compiler->token));
-		}
-	} else
-		compiler_error(p_compiler, "'add' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_inc(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 1) {
-		compiler_error(p_compiler, "'inc' expects 1 argument, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG)
-		compiler_push_inst(p_compiler, OPCODE_INC, compiler_token_to_reg(p_compiler), 0);
-	else
-		compiler_error(p_compiler, "'inc' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_sub(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 2) {
-		compiler_error(p_compiler, "'sub' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG) {
-		reg_t reg = compiler_token_to_reg(p_compiler);
-
-		compiler_next_token(p_compiler);
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_REG:
-			compiler_push_inst(p_compiler, OPCODE_SUB_R, reg, compiler_token_to_reg(p_compiler));
-
-			break;
-
-		case CASE_TOKEN_TYPE_NUM:
-			compiler_push_inst(p_compiler, OPCODE_SUB, reg, compiler_token_to_num(p_compiler));
-
-			break;
-
-		default:
-			compiler_error(p_compiler, "'sub' incorrect argument 2 type '%s'",
-			               token_type_to_str(p_compiler->token));
-		}
-	} else
-		compiler_error(p_compiler, "'sub' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_dec(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 1) {
-		compiler_error(p_compiler, "'dec' expects 1 argument, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG)
-		compiler_push_inst(p_compiler, OPCODE_DEC, compiler_token_to_reg(p_compiler), 0);
-	else
-		compiler_error(p_compiler, "'dec' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_mult(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 2) {
-		compiler_error(p_compiler, "'mult' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG) {
-		reg_t reg = compiler_token_to_reg(p_compiler);
-
-		compiler_next_token(p_compiler);
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_REG:
-			compiler_push_inst(p_compiler, OPCODE_MULT_R, reg, compiler_token_to_reg(p_compiler));
-
-			break;
-
-		case CASE_TOKEN_TYPE_NUM:
-			compiler_push_inst(p_compiler, OPCODE_MULT, reg, compiler_token_to_num(p_compiler));
-
-			break;
-
-		default:
-			compiler_error(p_compiler, "'mult' incorrect argument 2 type '%s'",
-			               token_type_to_str(p_compiler->token));
-		}
-	} else
-		compiler_error(p_compiler, "'mult' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_div(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 2) {
-		compiler_error(p_compiler, "'div' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG) {
-		reg_t reg = compiler_token_to_reg(p_compiler);
-
-		compiler_next_token(p_compiler);
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_REG:
-			compiler_push_inst(p_compiler, OPCODE_DIV_R, reg, compiler_token_to_reg(p_compiler));
-
-			break;
-
-		case CASE_TOKEN_TYPE_NUM:
-			compiler_push_inst(p_compiler, OPCODE_DIV, reg, compiler_token_to_num(p_compiler));
-
-			break;
-
-		default:
-			compiler_error(p_compiler, "'div' incorrect argument 2 type '%s'",
-			               token_type_to_str(p_compiler->token));
-		}
-	} else
-		compiler_error(p_compiler, "'div' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_mod(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 2) {
-		compiler_error(p_compiler, "'mod' expects 2 arguments, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	if (p_compiler->token->type == TOKEN_TYPE_REG) {
-		reg_t reg = compiler_token_to_reg(p_compiler);
-
-		compiler_next_token(p_compiler);
-		switch (p_compiler->token->type) {
-		case TOKEN_TYPE_REG:
-			compiler_push_inst(p_compiler, OPCODE_MOD_R, reg, compiler_token_to_reg(p_compiler));
-
-			break;
-
-		case CASE_TOKEN_TYPE_NUM:
-			compiler_push_inst(p_compiler, OPCODE_MOD, reg, compiler_token_to_num(p_compiler));
-
-			break;
-
-		default:
-			compiler_error(p_compiler, "'mod' incorrect argument 2 type '%s'",
-			               token_type_to_str(p_compiler->token));
-		}
-	} else
-		compiler_error(p_compiler, "'mod' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-}
-
-void compiler_inst_call(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 1) {
-		compiler_error(p_compiler, "'call' expects 1 argument, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	switch (p_compiler->token->type) {
-	case TOKEN_TYPE_REG:
-		compiler_push_inst(p_compiler, OPCODE_CALL_R, compiler_token_to_reg(p_compiler), 0);
-
-		break;
-
-	case CASE_TOKEN_TYPE_NUM:
-		compiler_push_inst(p_compiler, OPCODE_CALL, 0, compiler_token_to_num(p_compiler));
-
-		break;
-
-	default:
-		compiler_error(p_compiler, "'call' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-	}
-}
-
-void compiler_inst_callt(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 1) {
-		compiler_error(p_compiler, "'callt' expects 1 argument, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	switch (p_compiler->token->type) {
-	case TOKEN_TYPE_REG:
-		compiler_push_inst(p_compiler, OPCODE_CALL_T_R, compiler_token_to_reg(p_compiler), 0);
-
-		break;
-
-	case CASE_TOKEN_TYPE_NUM:
-		compiler_push_inst(p_compiler, OPCODE_CALL_T, 0, compiler_token_to_num(p_compiler));
-
-		break;
-
-	default:
-		compiler_error(p_compiler, "'callt' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-	}
-}
-
-void compiler_inst_callf(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 1) {
-		compiler_error(p_compiler, "'callf' expects 1 argument, got %li", (long)p_argc);
-
-		return;
-	} else
-		compiler_next_token(p_compiler);
-
-	switch (p_compiler->token->type) {
-	case TOKEN_TYPE_REG:
-		compiler_push_inst(p_compiler, OPCODE_CALL_F_R, compiler_token_to_reg(p_compiler), 0);
-
-		break;
-
-	case CASE_TOKEN_TYPE_NUM:
-		compiler_push_inst(p_compiler, OPCODE_CALL_F, 0, compiler_token_to_num(p_compiler));
-
-		break;
-
-	default:
-		compiler_error(p_compiler, "'callf' incorrect argument 1 type '%s'",
-		               token_type_to_str(p_compiler->token));
-	}
-}
-
-void compiler_inst_ret(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 0) {
-		compiler_error(p_compiler, "'ret' expects no arguments, got %li", (long)p_argc);
-
-		return;
-	}
-
-	compiler_push_inst(p_compiler, OPCODE_RET, 0, 0);
-}
-
-void compiler_inst_writef(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 0) {
-		compiler_error(p_compiler, "'writef' expects no arguments, got %li", (long)p_argc);
-
-		return;
-	}
-
-	compiler_push_inst(p_compiler, OPCODE_WRITEF, 0, 0);
-}
-
-void compiler_inst_memset(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 0) {
-		compiler_error(p_compiler, "'memset' expects no arguments, got %li", (long)p_argc);
-
-		return;
-	}
-
-	compiler_push_inst(p_compiler, OPCODE_MEMSET, 0, 0);
-}
-
-void compiler_inst_memcopy(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 0) {
-		compiler_error(p_compiler, "'memcopy' expects no arguments, got %li", (long)p_argc);
-
-		return;
-	}
-
-	compiler_push_inst(p_compiler, OPCODE_MEMCOPY, 0, 0);
-}
-
-void compiler_inst_debug(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 0) {
-		compiler_error(p_compiler, "'debug' expects no arguments, got %li", (long)p_argc);
-
-		return;
-	}
-
-	compiler_push_inst(p_compiler, OPCODE_DEBUG, 0, 0);
-}
-
-void compiler_inst_halt(compiler_t *p_compiler, size_t p_argc) {
-	if (p_argc != 0) {
-		compiler_error(p_compiler, "'halt' expects no arguments, got %li", (long)p_argc);
-
-		return;
-	}
-
-	compiler_push_inst(p_compiler, OPCODE_HALT, 0, 0);
-}
-
-void compiler_error(compiler_t *p_compiler, const char *p_fmt, ...) {
-	char    msg[1024];
-	va_list args;
-
-	va_start(args, p_fmt);
-	vsnprintf(msg, sizeof(msg), p_fmt, args);
-	va_end(args);
-
-	if (p_compiler->err_count > 0)
-		putchar('\n');
-
-	error_at(p_compiler->token->row + 1, p_compiler->token->col + 1, p_compiler->token->line,
-	         p_compiler->path, "Compiler error", msg);
-
-	++ p_compiler->err_count;
-	if (p_compiler->err_count >= MAX_COMPILER_ERRS) {
-		fputs("\nCompilation aborted.\n", stderr);
-		exit(EXIT_FAILURE);
-	}
-}
-
-void compiler_error_fatal(compiler_t *p_compiler, const char *p_fmt, ...) {
-	char    msg[1024];
-	va_list args;
-
-	va_start(args, p_fmt);
-	vsnprintf(msg, sizeof(msg), p_fmt, args);
-	va_end(args);
-
-	if (p_compiler->err_count > 0)
-		putchar('\n');
-
-	error_at(p_compiler->token->row + 1, p_compiler->token->col + 1, p_compiler->token->line,
-	         p_compiler->path, "Compiler error", msg);
-
-	fputs("\nCompilation aborted.\n", stderr);
-	exit(EXIT_FAILURE);
-}
-
-void compiler_error_at_prev(compiler_t *p_compiler, token_t *p_prev, const char *p_fmt, ...) {
-	char    msg[1024];
-	va_list args;
-
-	va_start(args, p_fmt);
-	vsnprintf(msg, sizeof(msg), p_fmt, args);
-	va_end(args);
-
-	token_t *current_token = p_compiler->token;
-	p_compiler->token      = p_prev;
-
-	compiler_error(p_compiler, msg);
-
-	p_compiler->token = current_token;
+void data_const_free(data_const_t *p_data_const) {
+	free(p_data_const->name);
 }

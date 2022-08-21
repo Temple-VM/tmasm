@@ -1,5 +1,51 @@
 #include "error.h"
 
+static void print_error_location(location_t *p_loc) {
+	/* generating nice gcc-like errors :) */
+
+	/* calculation and stuff */
+	char   row_str[32];
+	size_t row_str_len = snprintf(row_str, sizeof(row_str), "%lu", (unsigned long)p_loc->row);
+
+	size_t ptr_off = 0; /* character pointer offset */
+	for (size_t i = 0; i < p_loc->col; ++ i) {
+		if (p_loc->line[i] == '\t')
+			ptr_off += 3; /* tabs are always 4 spaces when you output them, right? */
+	}
+
+	char ptr_str[strlen(p_loc->line) + sizeof(row_str)];
+	memset(ptr_str, ' ', sizeof(ptr_str));
+
+	ptr_off += p_loc->col;
+	ptr_str[ptr_off - 1] = '^';
+	ptr_str[ptr_off]     = '\0';
+
+	/* printing the error */
+	fprintclrf(stderr, "  \x1bW-> At %s:%lu:%lu\x1bX\n", p_loc->file,
+	           (unsigned long)p_loc->row, (unsigned long)p_loc->col); /* -> At FILE:ROW:COL */
+	fprintclrf(stderr, "    \x1bW%s |\x1bX ", row_str);               /*   ROW | LINE */
+
+	/* outputting all of the chars manually because of tabs */
+	for (char *ch = p_loc->line; *ch != '\0'; ++ ch) {
+		switch (*ch) {
+		case '\n': break;
+		case '\t': fputs("    ", stderr); break;
+
+		default: fputc(*ch, stderr); break;
+		}
+	}
+
+	memset(row_str, ' ', row_str_len);
+	fprintclrf(stderr, "\n    \x1bW%s |\x1bM %s", row_str, ptr_str);
+
+	for (size_t i = 0; i < (p_loc->tok_len == 0? 0 : p_loc->tok_len - 1); ++ i)
+		fputc('~', stderr);
+
+	fprintclrf(stderr, "\x1bX\n\n");
+
+	fflush(stderr);
+}
+
 void fatal(const char *p_fmt, ...) {
 	char    msg[1024];
 	va_list args;
@@ -8,48 +54,49 @@ void fatal(const char *p_fmt, ...) {
 	vsnprintf(msg, sizeof(msg), p_fmt, args);
 	va_end(args);
 
-	fprintf(stderr, "Error: %s\nTry 'tmasm -h'\n", msg);
+	fprintclrf(stderr, "\x1bRError: \x1bX%s\nTry 'tmasm -h'\n", msg);
 
 	exit(EXIT_FAILURE);
 }
 
-void error_at(size_t p_line_num, size_t p_ch_num, const char *p_line,
-              const char *p_path, const char *p_title, const char *p_msg) {
-	/* generating nice gcc-like errors :) */
-	fprintf(stderr, "%s: %s\n  -> at %s:%lu:%lu\n", p_title, p_msg,
-	        p_path, (unsigned long)p_line_num, (unsigned long)p_ch_num);
+void error(location_t *p_loc, const char *p_fmt, ...) {
+	char    msg[1024];
+	va_list args;
 
-	char   line_num_str[32];
-	size_t line_num_str_len = snprintf(line_num_str, sizeof(line_num_str),
-	                                   "%lu", (unsigned long)p_line_num);
+	va_start(args, p_fmt);
+	vsnprintf(msg, sizeof(msg), p_fmt, args);
+	va_end(args);
 
-	size_t ptr_off = 0; /* character pointer offset */
-	for (size_t i = 0; i < p_ch_num; ++ i) {
-		if (p_line[i] == '\t')
-			ptr_off += 3; /* tabs are always 4 spaces when you output them, right? */
-	}
+	fprintclrf(stderr, "\x1bRError: \x1bX%s\n", msg);
+	print_error_location(p_loc);
+}
 
-	char err_ptr[strlen(p_line) + sizeof(line_num_str)];
-	memset(err_ptr, ' ', sizeof(err_ptr));
+void note(location_t *p_loc, const char *p_fmt, ...) {
+	char    msg[1024];
+	va_list args;
 
-	ptr_off += line_num_str_len + p_ch_num + 2;
+	va_start(args, p_fmt);
+	vsnprintf(msg, sizeof(msg), p_fmt, args);
+	va_end(args);
 
-	err_ptr[line_num_str_len + 1] = '|';
-	err_ptr[ptr_off]     = '^';
-	err_ptr[ptr_off + 1] = '\0';
+	fprintclrf(stderr, "\x1bNNote: \x1bX%s\n", msg);
+	print_error_location(p_loc);
+}
 
-	fprintf(stderr, "    %s | ", line_num_str);
+void warning(location_t *p_loc, const char *p_fmt, ...) {
+	char    msg[1024];
+	va_list args;
 
-	/* outputting all of the chars manually because of tabs */
-	for (const char *ch = p_line; *ch != '\0'; ++ ch) {
-		if (*ch == '\t')
-			fputs("    ", stderr);
-		else
-			fputc(*ch, stderr);
-	}
+	va_start(args, p_fmt);
+	vsnprintf(msg, sizeof(msg), p_fmt, args);
+	va_end(args);
 
+	fprintclrf(stderr, "\x1bYWarning: \x1bX%s\n", msg);
+	print_error_location(p_loc);
+}
 
-	fprintf(stderr, "\n    %s\n", err_ptr);
+void aborted(void) {
+	fprintclrf(stderr, "\x1bWCompilation aborted.\x1bX\n");
 
-	fflush(stderr);
+	exit(EXIT_FAILURE);
 }

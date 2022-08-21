@@ -1,157 +1,145 @@
-#ifndef INTERMEDIATE_H__HEADER_GUARD__
-#define INTERMEDIATE_H__HEADER_GUARD__
+#ifndef COMPILER_H__HEADER_GUARD__
+#define COMPILER_H__HEADER_GUARD__
 
-/* an AST is not needed */
+/* TODO: there is a lot of code repetition, a function for each instruction. maybe shorten it
+         by making a function for each operand case and reuse that function
 
-#include <stdio.h>   /* stderr, fputs, FILE, fopen, fclose */
-#include <stdlib.h>  /* malloc, realloc, free */
-#include <string.h>  /* memset, strcmp */
-#include <stdarg.h>  /* va_list, va_start, va_end, vsnprintf */
-#include <assert.h>  /* assert */
-#include <stdbool.h> /* bool, true, false */
-#include <stdint.h>  /* uint8_t */
+	for example:
+		jump &R1
+		call &R1
 
-#include "error.h"
+	these two instructions have the same operands, so instead make a function to handle a single
+	register operand and run it for these two instructions
+ */
+
+#include <stdint.h> /* uint8_t */
+#include <string.h> /* strcmp */
+
+#ifdef TMASM_DEBUG
+#	include <stdio.h> /* puts */
+#endif
+
+#include "utils.h"
 #include "list.h"
-#include "token.h"
-#include "lexer.h"
-#include "target.h"
+#include "parser.h"
 
-/* TODO: add data segments */
-
-#define MAX_COMPILER_ERRS   8
-#define PROGRAM_ENTRY_LABEL "entry"
-
-#define CASE_TOKEN_TYPE_NUM \
-	     TOKEN_TYPE_HEX:  case TOKEN_TYPE_DEC: \
-	case TOKEN_TYPE_CHAR: case TOKEN_TYPE_ID
-
-/* TODO: prevent name conflicts with labels and macros */
-/* TODO: warn about unused macro parameters */
+#define ENTRY_LABEL "entry"
 
 typedef struct {
-	const char *name;
-
-	list_t tokens;
-
-	char  *line;
-	size_t row, col;
-
-	list_t args;
-} macro_t;
-
-typedef struct {
-	const char *name;
-
-	word_t inst_pos;
+	char  *name;
+	size_t addr;
 } label_t;
 
 typedef struct {
-	list_t macros;
-	list_t labels;
-	list_t insts; /* compiled instructions */
+	char  *name;
+	size_t addr;
+} data_const_t;
 
-	word_t entry_point;
-
+typedef struct {
 	const char *path;
-	list_t      tokens;
 
-	token_t *token;
-	size_t   i;
+	parser_t parser;
 
-	size_t err_count;
+	node_t *node;
+
+	    /* node_t */
+	list_t nodes;
+
+	    /* inst_fix_t */
+	list_t insts_fix;
+
+	  /* uint8_t inst_t*/
+	list_t data, insts;
+	    /* label_t data_const_t*/
+	list_t labels, data_consts;
 } compiler_t;
 
 typedef struct {
-	const char *name;
-	void      (*func)(compiler_t*, size_t);
-} inst_func_map_t;
+	bool is_reg;
 
-extern inst_func_map_t g_insts_map[];
+	union {
+		word_t num;
+		reg_t  reg;
+	} value;
+} arg_any_t;
 
-void compile(const char *p_source_path, const char *p_out_path);
+typedef struct {
+	token_type_t key;
+	inst_t     (*func)(compiler_t*, size_t);
+} inst_func_t;
 
-void compiler_free_macros(compiler_t *p_compiler);
+extern inst_func_t g_inst_func_map[];
 
-void compiler_write_file(compiler_t *p_compiler, const char *p_out_path);
-void compiler_write_word_bytes(FILE *p_file, word_t p_data);
+void write_word_to_file(FILE *p_file, word_t p_data);
 
-void compiler_macros(compiler_t *p_compiler);
-void compiler_labels(compiler_t *p_compiler);
-void compiler_main(compiler_t *p_compiler);
-void compiler_inst(compiler_t *p_compiler);
-void compiler_macro_definition(compiler_t *p_compiler);
-void compiler_expand_macro(compiler_t *p_compiler);
+compiler_t compiler_new(const char *p_path);
 
-void compiler_next_token(compiler_t *p_compiler);
-void compiler_prev_token(compiler_t *p_compiler);
+void compiler_compile(compiler_t *p_compiler, const char *p_output_path);
 
-void compiler_push_inst(compiler_t *p_compiler, opcode_t p_opcode, reg_t p_reg, word_t p_data);
+void compiler_generate_tm_file(compiler_t *p_compiler, const char *p_path);
 
-reg_t  compiler_token_to_reg(compiler_t *p_compiler);
-word_t compiler_token_to_num(compiler_t *p_compiler);
+void compiler_compile_data(compiler_t *p_compiler);
+void compiler_compile_inst(compiler_t *p_compiler);
+void compiler_compile_label(compiler_t *p_compiler);
 
-void compiler_inst_move(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_none(compiler_t *p_compiler, size_t p_argc);
 
-void compiler_inst_write64(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_write32(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_write16(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_write8(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_move(compiler_t *p_compiler, size_t p_argc);
 
-void compiler_inst_read64(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_read32(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_read16(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_read8(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_write(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_read(compiler_t *p_compiler, size_t p_argc);
 
-void compiler_inst_push64(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_push32(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_push16(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_push8(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_pusha(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_push(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_pusha(compiler_t *p_compiler, size_t p_argc);
 
-void compiler_inst_pop64(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_pop32(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_pop16(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_pop8(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_popa(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_pop(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_popa(compiler_t *p_compiler, size_t p_argc);
 
-void compiler_inst_eq(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_neq(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_gt(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_ge(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_lt(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_le(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_eq(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_neq(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_gt(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_ge(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_lt(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_le(compiler_t *p_compiler, size_t p_argc);
 
-void compiler_inst_jump(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_jumpt(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_jumpf(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_jump(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_jumpt(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_jumpf(compiler_t *p_compiler, size_t p_argc);
 
-void compiler_inst_add(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_inc(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_add(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_inc(compiler_t *p_compiler, size_t p_argc);
 
-void compiler_inst_sub(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_dec(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_sub(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_dec(compiler_t *p_compiler, size_t p_argc);
 
-void compiler_inst_mult(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_div(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_mod(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_mult(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_div(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_mod(compiler_t *p_compiler, size_t p_argc);
 
-void compiler_inst_call(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_callt(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_callf(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_ret(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_rshift(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_lshift(compiler_t *p_compiler, size_t p_argc);
 
-void compiler_inst_writef(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_and(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_or(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_not(compiler_t *p_compiler, size_t p_argc);
 
-void compiler_inst_memset(compiler_t *p_compiler, size_t p_argc);
-void compiler_inst_memcopy(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_bitand(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_bitor(compiler_t *p_compiler, size_t p_argc);
 
-void compiler_inst_debug(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_call(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_callt(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_callf(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_ret(compiler_t *p_compiler, size_t p_argc);
 
-void compiler_inst_halt(compiler_t *p_compiler, size_t p_argc);
+inst_t compiler_compile_inst_syscall(compiler_t *p_compiler, size_t p_argc);
 
-void compiler_error(compiler_t *p_compiler, const char *p_fmt, ...);
-void compiler_error_fatal(compiler_t *p_compiler, const char *p_fmt, ...);
-void compiler_error_at_prev(compiler_t *p_compiler, token_t *p_prev, const char *p_fmt, ...);
+inst_t compiler_compile_inst_halt(compiler_t *p_compiler, size_t p_argc);
+
+word_t    compiler_get_num_arg(compiler_t *p_compiler, node_t *p_node, const char *p_inst);
+reg_t     compiler_get_reg_arg(compiler_t *p_compiler, node_t *p_node, const char *p_inst);
+arg_any_t compiler_get_any_arg(compiler_t *p_compiler, node_t *p_node, const char *p_inst);
+
+void label_free(label_t *p_label);
+void data_const_free(data_const_t *p_data_const);
 
 #endif

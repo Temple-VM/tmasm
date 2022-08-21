@@ -2,12 +2,20 @@
 #define ERROR_H__HEADER_GUARD__
 
 #include <stdlib.h> /* exit, EXIT_FAILURE */
-#include <stdio.h>  /* fprintf, snprintf, fflush, stderr, fputs, fputc */
-#include <stdarg.h> /* va_list, va_start, va_end, vsnprintf */
-#include <string.h> /* strlen */
+#include <stdio.h>  /* fprintf, stderr, fputc, fputs, snprintf, fflush */
+#include <stdarg.h> /* va_list, va_start, va_end, vsnprintf, fputs */
+
+#include "colors.h"
+#include "location.h"
+
+#define QUOTES(p_fmt) "\x1bW'"p_fmt"'\x1bX"
 
 void fatal(const char *p_fmt, ...);
-void error_at(size_t p_line_num, size_t p_ch_num, const char *p_line,
-              const char *p_path, const char *p_title, const char *p_msg);
+
+void error(location_t *p_loc, const char *p_fmt, ...);
+void note(location_t *p_loc, const char *p_fmt, ...);
+void warning(location_t *p_loc, const char *p_fmt, ...);
+
+void aborted(void);
 
 #endif
