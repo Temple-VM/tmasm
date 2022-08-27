@@ -244,13 +244,13 @@ void compiler_compile_data(compiler_t *p_compiler) {
 
 void compiler_compile_inst(compiler_t *p_compiler) {
 	size_t argc = 0;
-	if (p_compiler->node->right != NULL)
+	if (p_compiler->node->left != NULL)
 		argc = 1;
 
-	if (p_compiler->node->left != NULL) {
+	if (p_compiler->node->right != NULL) {
 		argc = 2;
 
-		if (p_compiler->node->right == NULL)
+		if (p_compiler->node->left == NULL)
 			INTERNAL_BUG;
 	}
 
