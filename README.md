@@ -42,7 +42,8 @@ To run a binary, you need to install the [Temple VM](https://github.com/lordoftr
 
 ## Milestones
 - [X] Labels, compile all instructions from Temple 1.0.0 and generate an executable
-- [ ] Data segment
+- [X] Data segment
+- [ ] File I/O
 - [ ] Include keyword
 
 ## Documentation

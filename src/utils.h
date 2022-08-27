@@ -4,6 +4,8 @@
 #include <assert.h> /* assert */
 #include <stdlib.h> /* size_t, malloc, realloc, free */
 #include <string.h> /* memcpy, strlen */
+#include <stdint.h> /* uint64_t */
+#include <stdio.h>  /* FILE, fwrite */
 
 #define INTERNAL_BUG \
 	assert(0 && "If this shows, it is an internal bug, please report it")
@@ -25,5 +27,7 @@ void  memfree(void **p_ptr);
 void *memalloccopy(const void *p_ptr, size_t p_size);
 
 char *copy_str(const char *p_str);
+
+void fwrite64_little_endian(uint64_t p_data, FILE *p_file);
 
 #endif

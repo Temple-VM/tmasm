@@ -70,8 +70,6 @@ typedef struct {
 
 extern inst_func_t g_inst_func_map[];
 
-void write_word_to_file(FILE *p_file, word_t p_data);
-
 compiler_t compiler_new(const char *p_path);
 
 void compiler_compile(compiler_t *p_compiler, const char *p_output_path);

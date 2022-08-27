@@ -118,7 +118,7 @@ node_t *parser_parse_data(parser_t *p_parser) {
 	case TOKEN_TYPE_INT32_TYPE: node->size = 32; break;
 	case TOKEN_TYPE_INT16_TYPE: node->size = 16; break;
 	case TOKEN_TYPE_BYTE_TYPE:  node->size = 8;  break;
-	case TOKEN_TYPE_WORD_TYPE:  node->size = sizeof(word_t); break;
+	case TOKEN_TYPE_WORD_TYPE:  node->size = sizeof(word_t) * 8; break;
 
 	default: INTERNAL_BUG;
 	}
@@ -164,7 +164,7 @@ node_t *parser_parse_inst(parser_t *p_parser) {
 			case TOKEN_TYPE_INT32_TYPE: node->size = 32; break;
 			case TOKEN_TYPE_INT16_TYPE: node->size = 16; break;
 			case TOKEN_TYPE_BYTE_TYPE:  node->size = 8;  break;
-			case TOKEN_TYPE_WORD_TYPE:  node->size = sizeof(word_t); break;
+			case TOKEN_TYPE_WORD_TYPE:  node->size = sizeof(word_t) * 8; break;
 
 			default: INTERNAL_BUG;
 			}

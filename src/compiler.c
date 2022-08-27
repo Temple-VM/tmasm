@@ -55,21 +55,6 @@ inst_func_t g_inst_func_map[] = {
 	{.key = TOKEN_TYPE_INST_HALT, .func = compiler_compile_inst_halt},
 };
 
-void write_word_to_file(FILE *p_file, word_t p_data) {
-	uint8_t bytes[sizeof(word_t)] = {
-        (p_data & 0xFF00000000000000) >> 070,
-        (p_data & 0x00FF000000000000) >> 060,
-        (p_data & 0x0000FF0000000000) >> 050,
-        (p_data & 0x000000FF00000000) >> 040,
-        (p_data & 0x00000000FF000000) >> 030,
-        (p_data & 0x0000000000FF0000) >> 020,
-        (p_data & 0x000000000000FF00) >> 010,
-        (p_data & 0x00000000000000FF)
-	};
-
-	fwrite(bytes, 1, sizeof(bytes), p_file);
-}
-
 compiler_t compiler_new(const char *p_path) {
 	compiler_t compiler = {0};
 	compiler.parser = parser_new(p_path);
@@ -163,11 +148,11 @@ void compiler_generate_tm_file(compiler_t *p_compiler, const char *p_path) {
 
 	fputs("#!/usr/bin/temple\nTM", file);
 
-	write_word_to_file(file, entry_point->addr);
-	//write_word_to_file(file, p_compiler->data.count);
-	write_word_to_file(file, p_compiler->insts.count);
+	fwrite64_little_endian(entry_point->addr, file);
+	fwrite64_little_endian(p_compiler->data.count, file);
+	fwrite64_little_endian(p_compiler->insts.count, file);
 
-	//fwrite(p_compiler->data.buf, 1, p_compiler->data.count, file);
+	fwrite(p_compiler->data.buf, 1, p_compiler->data.count, file);
 
 	for (size_t i = 0; i < p_compiler->insts.count; ++ i) {
 		inst_t *inst = LIST_AT(inst_t, &p_compiler->insts, i);
@@ -193,14 +178,14 @@ void compiler_generate_tm_file(compiler_t *p_compiler, const char *p_path) {
 
 void compiler_compile_data(compiler_t *p_compiler) {
 	data_const_t data_const = {
-		.name = copy_str(p_compiler->node->right->tok->data),
+		.name = copy_str(p_compiler->node->left->tok->data),
 		.addr = p_compiler->data.count
 	};
 
-	switch (p_compiler->node->left->type) {
+	switch (p_compiler->node->right->type) {
 	case NODE_TYPE_NUM:
 		{
-			uint64_t data = p_compiler->node->left->data.num;
+			uint64_t data = p_compiler->node->right->data.num;
 
 			switch (p_compiler->node->size) {
 			case 8: LIST_PUSH(uint8_t, &p_compiler->data, data); break;
@@ -238,7 +223,7 @@ void compiler_compile_data(compiler_t *p_compiler) {
 
 	case NODE_TYPE_STR:
 		{
-			char *data = p_compiler->node->left->tok->data;
+			char *data = p_compiler->node->right->tok->data;
 
 			/* use <= to also include the null terminator */
 			for (size_t i = 0; i <= strlen(data); ++ i) {

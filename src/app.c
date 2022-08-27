@@ -10,7 +10,7 @@ void help(void) {
 	     "\n"
 	     "Github: https://github.com/Temple-VM/tmasm\n"
 	     "\n"
-	     "Usage: tmasm [OPTIONS] [FILE [OUT]]\n"
+	     "Usage: tmasm [OPTIONS] [FILE] [OUT]\n"
 	     "OPTIONS:\n"
 	     "  -h, --help,    - show this message\n"
 	     "  -v, --version  - show the version\n"
