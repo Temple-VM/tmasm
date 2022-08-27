@@ -20,10 +20,10 @@ PAIR_T(keyword) g_keywords[] = {
 	{.key = "read",  .value = TOKEN_TYPE_INST_READ},
 
 	{.key = "push",  .value = TOKEN_TYPE_INST_PUSH},
-	{.key = "pushA", .value = TOKEN_TYPE_INST_PUSH_A},
+	{.key = "pusha", .value = TOKEN_TYPE_INST_PUSH_A},
 
 	{.key = "pop",  .value = TOKEN_TYPE_INST_POP},
-	{.key = "popA", .value = TOKEN_TYPE_INST_POP_A},
+	{.key = "popa", .value = TOKEN_TYPE_INST_POP_A},
 
 	{.key = "eq",  .value = TOKEN_TYPE_INST_EQ},
 	{.key = "neq", .value = TOKEN_TYPE_INST_NEQ},
