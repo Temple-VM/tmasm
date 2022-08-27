@@ -74,6 +74,7 @@ compiler_t compiler_new(const char *p_path) {
 	compiler.insts       = list_new(sizeof(inst_t),       NULL);
 	compiler.labels      = list_new(sizeof(label_t),      LIST_FREE_FUNC(label_free));
 	compiler.data_consts = list_new(sizeof(data_const_t), LIST_FREE_FUNC(data_const_free));
+	compiler.macros      = list_new(sizeof(macro_t),      LIST_FREE_FUNC(macro_free));
 
 	return compiler;
 }
@@ -88,6 +89,7 @@ void compiler_compile(compiler_t *p_compiler, const char *p_output_path) {
 
 		switch (p_compiler->node->type) {
 		case NODE_TYPE_DATA:
+		case NODE_TYPE_DEFINE:
 		case NODE_TYPE_INST:
 			list_push(&p_compiler->nodes, p_compiler->node);
 			free(p_compiler->node);
@@ -109,8 +111,9 @@ void compiler_compile(compiler_t *p_compiler, const char *p_output_path) {
 		p_compiler->node = LIST_AT(node_t, &p_compiler->nodes, i);
 
 		switch (p_compiler->node->type) {
-		case NODE_TYPE_DATA: compiler_compile_data(p_compiler); break;
-		case NODE_TYPE_INST: compiler_compile_inst(p_compiler); break;
+		case NODE_TYPE_DATA:   compiler_compile_data(p_compiler);   break;
+		case NODE_TYPE_DEFINE: compiler_compile_define(p_compiler); break;
+		case NODE_TYPE_INST:   compiler_compile_inst(p_compiler);   break;
 
 		default: INTERNAL_BUG;
 		}
@@ -124,6 +127,7 @@ void compiler_compile(compiler_t *p_compiler, const char *p_output_path) {
 	list_free(&p_compiler->insts);
 	list_free(&p_compiler->labels);
 	list_free(&p_compiler->data_consts);
+	list_free(&p_compiler->macros);
 }
 
 void compiler_generate_tm_file(compiler_t *p_compiler, const char *p_path) {
@@ -240,6 +244,23 @@ void compiler_compile_data(compiler_t *p_compiler) {
 	}
 
 	list_push(&p_compiler->data_consts, &data_const);
+}
+
+void compiler_compile_define(compiler_t *p_compiler) {
+	macro_t macro = {
+		.name = copy_str(p_compiler->node->left->tok->data),
+		.node = p_compiler->node
+	};
+
+	switch (p_compiler->node->right->type) {
+	case NODE_TYPE_NUM:
+	case NODE_TYPE_REG:
+		break;
+
+	default: INTERNAL_BUG; /* the parser should not allow any unexpected tokens through */
+	}
+
+	list_push(&p_compiler->macros, &macro);
 }
 
 void compiler_compile_inst(compiler_t *p_compiler) {
@@ -1084,6 +1105,29 @@ word_t compiler_get_num_arg(compiler_t *p_compiler, node_t *p_node, const char *
 				return label->addr;
 		}
 
+		/* is the identifier a macro? */
+		for (size_t i = 0; i < p_compiler->macros.count; ++ i) {
+			macro_t *macro = LIST_AT(macro_t, &p_compiler->macros, i);
+
+			if (strcmp(macro->name, p_node->tok->data) == 0) {
+				switch (macro->node->right->type) {
+				case NODE_TYPE_NUM: return macro->node->right->data.num;
+				case NODE_TYPE_REG:
+					error(&macro->node->tok->loc, QUOTES("%s")" arg expected to be "QUOTES("%s")
+					      ", got "QUOTES("%s"), p_inst, node_type_to_str(NODE_TYPE_NUM),
+					      node_type_to_str(macro->node->right->type));
+
+					note(&macro->node->left->tok->loc, "Macro defined here");
+
+					aborted();
+
+					break;
+
+				default: INTERNAL_BUG;
+				}
+			}
+		}
+
 		error(&p_node->tok->loc, "Identifier "QUOTES("%s")" not defined",
 		      p_node->tok->data);
 
@@ -1092,7 +1136,7 @@ word_t compiler_get_num_arg(compiler_t *p_compiler, node_t *p_node, const char *
 		break;
 
 	default:
-		error(&p_node->tok->loc, QUOTES("%s")" arg expected to be "QUOTES("%s")", got "QUOTES("%S"),
+		error(&p_node->tok->loc, QUOTES("%s")" arg expected to be "QUOTES("%s")", got "QUOTES("%s"),
 		      p_inst, node_type_to_str(NODE_TYPE_NUM), node_type_to_str(p_node->type));
 
 		aborted();
@@ -1106,6 +1150,36 @@ reg_t compiler_get_reg_arg(compiler_t *p_compiler, node_t *p_node, const char *p
 
 	switch (p_node->type) {
 	case NODE_TYPE_REG: return (reg_t)p_node->data.num; break;
+	case NODE_TYPE_ID:
+		/* is the identifier a macro? */
+		for (size_t i = 0; i < p_compiler->macros.count; ++ i) {
+			macro_t *macro = LIST_AT(macro_t, &p_compiler->macros, i);
+
+			if (strcmp(macro->name, p_node->tok->data) == 0) {
+				switch (macro->node->right->type) {
+				case NODE_TYPE_REG: return (reg_t)macro->node->right->data.num;
+				case NODE_TYPE_NUM:
+					error(&macro->node->tok->loc, QUOTES("%s")" arg expected to be "QUOTES("%s")
+					      ", got "QUOTES("%s"), p_inst, node_type_to_str(NODE_TYPE_REG),
+					      node_type_to_str(macro->node->right->type));
+
+					note(&macro->node->left->tok->loc, "Macro defined here");
+
+					aborted();
+
+					break;
+
+				default: INTERNAL_BUG;
+				}
+			}
+		}
+
+		error(&p_node->tok->loc, "Identifier "QUOTES("%s")" not defined",
+		      p_node->tok->data);
+
+		aborted();
+
+		break;
 
 	default:
 		error(&p_node->tok->loc, QUOTES("%s")" arg expected to be "QUOTES("%s")", got "QUOTES("%s"),
@@ -1153,4 +1227,8 @@ void label_free(label_t *p_label) {
 
 void data_const_free(data_const_t *p_data_const) {
 	free(p_data_const->name);
+}
+
+void macro_free(macro_t *p_macro) {
+	free(p_macro->name);
 }

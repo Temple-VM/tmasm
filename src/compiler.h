@@ -36,6 +36,11 @@ typedef struct {
 } data_const_t;
 
 typedef struct {
+	char   *name;
+	node_t *node;
+} macro_t;
+
+typedef struct {
 	const char *path;
 
 	parser_t parser;
@@ -50,8 +55,8 @@ typedef struct {
 
 	  /* uint8_t inst_t*/
 	list_t data, insts;
-	    /* label_t data_const_t*/
-	list_t labels, data_consts;
+	    /* label_t data_const_t macro_t*/
+	list_t labels, data_consts, macros;
 } compiler_t;
 
 typedef struct {
@@ -77,6 +82,7 @@ void compiler_compile(compiler_t *p_compiler, const char *p_output_path);
 void compiler_generate_tm_file(compiler_t *p_compiler, const char *p_path);
 
 void compiler_compile_data(compiler_t *p_compiler);
+void compiler_compile_define(compiler_t *p_compiler);
 void compiler_compile_inst(compiler_t *p_compiler);
 void compiler_compile_label(compiler_t *p_compiler);
 
@@ -139,5 +145,6 @@ arg_any_t compiler_get_any_arg(compiler_t *p_compiler, node_t *p_node, const cha
 
 void label_free(label_t *p_label);
 void data_const_free(data_const_t *p_data_const);
+void macro_free(macro_t *p_macro);
 
 #endif

@@ -30,6 +30,7 @@ void     parser_free(parser_t *p_parser);
 node_t *parser_parse_next(parser_t *p_parser);
 
 node_t *parser_parse_data(parser_t *p_parser);
+node_t *parser_parse_define(parser_t *p_parser);
 node_t *parser_parse_inst(parser_t *p_parser);
 node_t *parser_parse_label(parser_t *p_parser);
 

@@ -2,6 +2,7 @@
 
 pair_t g_keywords[] = {
 	{.key = (void*)"include", .value = (void*)TOKEN_TYPE_INCLUDE},
+	{.key = (void*)"define",  .value = (void*)TOKEN_TYPE_DEFINE},
 	{.key = (void*)"data",    .value = (void*)TOKEN_TYPE_DATA},
 
 	{.key = (void*)"INT64", .value = (void*)TOKEN_TYPE_INT64_TYPE},

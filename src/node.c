@@ -33,9 +33,10 @@ void node_dump(node_t *p_node) {
 
 const char *node_type_to_str(node_type_t p_type) {
 	switch (p_type) {
-	case NODE_TYPE_INST:  return "instruction";
-	case NODE_TYPE_DATA:  return "data";
-	case NODE_TYPE_LABEL: return "label";
+	case NODE_TYPE_INST:   return "instruction";
+	case NODE_TYPE_DATA:   return "data";
+	case NODE_TYPE_DEFINE: return "define";
+	case NODE_TYPE_LABEL:  return "label";
 
 	case NODE_TYPE_REG: return "register";
 	case NODE_TYPE_NUM: return "number";
@@ -89,8 +90,9 @@ node_t *node_new(token_t *p_tok) {
 	case TOKEN_TYPE_BYTE_TYPE:  node->type = NODE_TYPE_BYTE_TYPE;  break;
 	case TOKEN_TYPE_WORD_TYPE:  node->type = NODE_TYPE_WORD_TYPE;  break;
 
-	case TOKEN_TYPE_LABEL: node->type = NODE_TYPE_LABEL; break;
-	case TOKEN_TYPE_DATA:  node->type = NODE_TYPE_DATA;  break;
+	case TOKEN_TYPE_LABEL:  node->type = NODE_TYPE_LABEL;  break;
+	case TOKEN_TYPE_DATA:   node->type = NODE_TYPE_DATA;   break;
+	case TOKEN_TYPE_DEFINE: node->type = NODE_TYPE_DEFINE; break;
 
 	default:
 		if (token_type_is_inst(p_tok->type))

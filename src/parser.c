@@ -74,8 +74,9 @@ node_t *parser_parse_next(parser_t *p_parser) {
 		return NULL;
 
 	switch (p_parser->tok->type) {
-	case TOKEN_TYPE_LABEL: return parser_parse_label(p_parser);
-	case TOKEN_TYPE_DATA:  return parser_parse_data(p_parser);
+	case TOKEN_TYPE_LABEL:  return parser_parse_label(p_parser);
+	case TOKEN_TYPE_DATA:   return parser_parse_data(p_parser);
+	case TOKEN_TYPE_DEFINE: return parser_parse_define(p_parser);
 
 	default:
 		if (token_type_is_inst(p_parser->tok->type))
@@ -126,6 +127,49 @@ node_t *parser_parse_data(parser_t *p_parser) {
 	parser_next_token(p_parser);
 
 	if (!token_type_is_value(p_parser->tok->type)) {
+		error(&p_parser->tok->loc, "Expected a value "
+		      "("QUOTES("%s")", "QUOTES("%s")", "QUOTES("%s")", "QUOTES("%s")")"
+		      ", got "QUOTES("%s"),
+		      token_type_to_str(TOKEN_TYPE_HEX), token_type_to_str(TOKEN_TYPE_DEC),
+		      token_type_to_str(TOKEN_TYPE_CH),token_type_to_str(TOKEN_TYPE_STR),
+		      token_type_to_str(p_parser->tok->type));
+
+		aborted();
+	}
+
+	node->right = node_new(p_parser->tok);
+
+	parser_next_token(p_parser);
+
+	if (!parser_at_end(p_parser)) {
+		error(&p_parser->tok->loc, "Expected "QUOTES("%s")", got "QUOTES("%s"),
+		      token_type_to_str(TOKEN_TYPE_NEW_LINE), token_type_to_str(p_parser->tok->type));
+
+		aborted();
+	}
+
+	parser_next_token(p_parser);
+
+	return node;
+}
+
+node_t *parser_parse_define(parser_t *p_parser) {
+	node_t *node = node_new(p_parser->tok);
+
+	parser_next_token(p_parser);
+
+	if (p_parser->tok->type != TOKEN_TYPE_ID) {
+		error(&p_parser->tok->loc, "Expected "QUOTES("%s")", got "QUOTES("%s"),
+		      token_type_to_str(TOKEN_TYPE_ID), token_type_to_str(p_parser->tok->type));
+
+		aborted();
+	}
+
+	node->left = node_new(p_parser->tok);
+
+	parser_next_token(p_parser);
+
+	if (!token_type_is_arg(p_parser->tok->type)) {
 		error(&p_parser->tok->loc, "Expected a value "
 		      "("QUOTES("%s")", "QUOTES("%s")", "QUOTES("%s")", "QUOTES("%s")")"
 		      ", got "QUOTES("%s"),

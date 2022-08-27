@@ -23,6 +23,7 @@ const char *token_type_to_str(token_type_t p_type) {
 	case TOKEN_TYPE_ID:    return "identifier";
 
 	case TOKEN_TYPE_INCLUDE: return "include";
+	case TOKEN_TYPE_DEFINE:  return "define";
 	case TOKEN_TYPE_DATA:    return "data";
 
 	case TOKEN_TYPE_LPAREN: return "(";
