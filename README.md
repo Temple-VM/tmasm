@@ -1,5 +1,5 @@
 <p align="center">
-	<h1 align="center">TMASM</h2>
+	<img width="450px" src="res/logo.png"/>
 	<p align="center">An assembler for the Temple VM</p>
 </p>
 <p align="center">
