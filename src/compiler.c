@@ -88,9 +88,10 @@ void compiler_compile(compiler_t *p_compiler, const char *p_output_path) {
 #endif
 
 		switch (p_compiler->node->type) {
+		case NODE_TYPE_INST: ++ p_compiler->addr;
+			/* fall through */
 		case NODE_TYPE_DATA:
 		case NODE_TYPE_DEFINE:
-		case NODE_TYPE_INST:
 			list_push(&p_compiler->nodes, p_compiler->node);
 			free(p_compiler->node);
 
@@ -287,7 +288,7 @@ void compiler_compile_inst(compiler_t *p_compiler) {
 void compiler_compile_label(compiler_t *p_compiler) {
 	label_t label = {
 		.name = copy_str(p_compiler->node->tok->data),
-		.addr = p_compiler->insts.count
+		.addr = p_compiler->addr
 	};
 
 	list_push(&p_compiler->labels, &label);

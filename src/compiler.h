@@ -47,6 +47,8 @@ typedef struct {
 
 	node_t *node;
 
+	word_t addr;
+
 	    /* node_t */
 	list_t nodes;
 
@@ -55,6 +57,7 @@ typedef struct {
 
 	  /* uint8_t inst_t*/
 	list_t data, insts;
+
 	    /* label_t data_const_t macro_t*/
 	list_t labels, data_consts, macros;
 } compiler_t;
