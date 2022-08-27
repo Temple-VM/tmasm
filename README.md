@@ -32,7 +32,7 @@ An assembler for the [Temple VM](https://github.com/Temple-VM/temple) written in
 ```sh
 $ make
 $ make install
-$ ./bin/app
+$ tmasm
 ```
 
 ## Examples
