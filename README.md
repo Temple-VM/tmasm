@@ -18,7 +18,7 @@
 ## Table of contents
 * [Introduction](#introduction)
 * [Quickstart](#quickstart)
-* [Compile the examples](#compile-and-run-the-examples)
+* [Examples](#examples)
 * [Milestones](#Milestones)
 * [Documentation](#documentation)
 * [Bugs](#bugs)
@@ -26,7 +26,7 @@
 * [Make](#make)
 
 ## Introduction
-An assembler for the [Temple VM](https://github.com/lordoftrident/temple) written in C.
+An assembler for the [Temple VM](https://github.com/Temple-VM/temple) written in C.
 
 ## Quickstart
 ```sh
@@ -35,10 +35,8 @@ $ make install
 $ ./bin/app
 ```
 
-## Compile and run the examples
-To compile the examples, run `make example`. All the binaries will be generated in the `./examples`
-folder.
-To run a binary, you need to install the [Temple VM](https://github.com/lordoftrident/temple)
+## Examples
+To see examples, [click here](https://github.com/Temple-VM/examples)
 
 ## Milestones
 - [X] Labels, compile all instructions from Temple 1.0.0 and generate an executable
