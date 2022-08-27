@@ -174,7 +174,7 @@ node_t *parser_parse_define(parser_t *p_parser) {
 		      "("QUOTES("%s")", "QUOTES("%s")", "QUOTES("%s")", "QUOTES("%s")")"
 		      ", got "QUOTES("%s"),
 		      token_type_to_str(TOKEN_TYPE_HEX), token_type_to_str(TOKEN_TYPE_DEC),
-		      token_type_to_str(TOKEN_TYPE_CH),token_type_to_str(TOKEN_TYPE_STR),
+		      token_type_to_str(TOKEN_TYPE_CH),token_type_to_str(TOKEN_TYPE_REG_1),
 		      token_type_to_str(p_parser->tok->type));
 
 		aborted();
