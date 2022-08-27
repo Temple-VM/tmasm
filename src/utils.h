@@ -16,9 +16,19 @@
 
 #define SIZE_OF(p_ptr) (sizeof(p_ptr) / sizeof(p_ptr[0]))
 
-typedef struct {
-	void *key, *value;
-} pair_t;
+#define __MAKE_PAIR(p_id, p_key, p_value) \
+	typedef struct { \
+		p_key; \
+		p_value; \
+	} pair_##p_id##_t
+
+#define MAKE_PAIR_T(p_id, p_key_type, p_value_type) \
+	__MAKE_PAIR(p_id, p_key_type key, p_value_type value)
+
+#define MAKE_PAIR_T_FUNC(p_id, p_key_type, p_return_type, ...) \
+	__MAKE_PAIR(p_id, p_key_type key, p_return_type (*value)(__VA_ARGS__))
+
+#define PAIR_T(p_id) pair_##p_id##_t
 
 void *memalloc(size_t p_size);
 void *memrealloc(void *p_ptr, size_t p_size);

@@ -1,94 +1,94 @@
 #include "lexer.h"
 
-pair_t g_keywords[] = {
-	{.key = (void*)"include", .value = (void*)TOKEN_TYPE_INCLUDE},
-	{.key = (void*)"define",  .value = (void*)TOKEN_TYPE_DEFINE},
-	{.key = (void*)"data",    .value = (void*)TOKEN_TYPE_DATA},
+PAIR_T(keyword) g_keywords[] = {
+	{.key = "include", .value = TOKEN_TYPE_INCLUDE},
+	{.key = "define",  .value = TOKEN_TYPE_DEFINE},
+	{.key = "data",    .value = TOKEN_TYPE_DATA},
 
-	{.key = (void*)"INT64", .value = (void*)TOKEN_TYPE_INT64_TYPE},
-	{.key = (void*)"INT32", .value = (void*)TOKEN_TYPE_INT32_TYPE},
-	{.key = (void*)"INT16", .value = (void*)TOKEN_TYPE_INT16_TYPE},
-	{.key = (void*)"WORD",  .value = (void*)TOKEN_TYPE_WORD_TYPE},
-	{.key = (void*)"BYTE",  .value = (void*)TOKEN_TYPE_BYTE_TYPE},
+	{.key = "INT64", .value = TOKEN_TYPE_INT64_TYPE},
+	{.key = "INT32", .value = TOKEN_TYPE_INT32_TYPE},
+	{.key = "INT16", .value = TOKEN_TYPE_INT16_TYPE},
+	{.key = "WORD",  .value = TOKEN_TYPE_WORD_TYPE},
+	{.key = "BYTE",  .value = TOKEN_TYPE_BYTE_TYPE},
 
-	{.key = (void*)"none", .value = (void*)TOKEN_TYPE_INST_NONE},
+	{.key = "none", .value = TOKEN_TYPE_INST_NONE},
 
-	{.key = (void*)"move", .value = (void*)TOKEN_TYPE_INST_MOVE},
+	{.key = "move", .value = TOKEN_TYPE_INST_MOVE},
 
-	{.key = (void*)"write", .value = (void*)TOKEN_TYPE_INST_WRITE},
+	{.key = "write", .value = TOKEN_TYPE_INST_WRITE},
 
-	{.key = (void*)"read",  .value = (void*)TOKEN_TYPE_INST_READ},
+	{.key = "read",  .value = TOKEN_TYPE_INST_READ},
 
-	{.key = (void*)"push",  .value = (void*)TOKEN_TYPE_INST_PUSH},
-	{.key = (void*)"pushA", .value = (void*)TOKEN_TYPE_INST_PUSH_A},
+	{.key = "push",  .value = TOKEN_TYPE_INST_PUSH},
+	{.key = "pushA", .value = TOKEN_TYPE_INST_PUSH_A},
 
-	{.key = (void*)"pop",  .value = (void*)TOKEN_TYPE_INST_POP},
-	{.key = (void*)"popA", .value = (void*)TOKEN_TYPE_INST_POP_A},
+	{.key = "pop",  .value = TOKEN_TYPE_INST_POP},
+	{.key = "popA", .value = TOKEN_TYPE_INST_POP_A},
 
-	{.key = (void*)"eq",  .value = (void*)TOKEN_TYPE_INST_EQ},
-	{.key = (void*)"neq", .value = (void*)TOKEN_TYPE_INST_NEQ},
-	{.key = (void*)"gt",  .value = (void*)TOKEN_TYPE_INST_GT},
-	{.key = (void*)"ge",  .value = (void*)TOKEN_TYPE_INST_GE},
-	{.key = (void*)"lt",  .value = (void*)TOKEN_TYPE_INST_LT},
-	{.key = (void*)"le",  .value = (void*)TOKEN_TYPE_INST_LE},
+	{.key = "eq",  .value = TOKEN_TYPE_INST_EQ},
+	{.key = "neq", .value = TOKEN_TYPE_INST_NEQ},
+	{.key = "gt",  .value = TOKEN_TYPE_INST_GT},
+	{.key = "ge",  .value = TOKEN_TYPE_INST_GE},
+	{.key = "lt",  .value = TOKEN_TYPE_INST_LT},
+	{.key = "le",  .value = TOKEN_TYPE_INST_LE},
 
-	{.key = (void*)"jump",  .value = (void*)TOKEN_TYPE_INST_JUMP},
-	{.key = (void*)"jumpt", .value = (void*)TOKEN_TYPE_INST_JUMPT},
-	{.key = (void*)"jumpf", .value = (void*)TOKEN_TYPE_INST_JUMPF},
+	{.key = "jump",  .value = TOKEN_TYPE_INST_JUMP},
+	{.key = "jumpt", .value = TOKEN_TYPE_INST_JUMPT},
+	{.key = "jumpf", .value = TOKEN_TYPE_INST_JUMPF},
 
-	{.key = (void*)"add", .value = (void*)TOKEN_TYPE_INST_ADD},
-	{.key = (void*)"inc", .value = (void*)TOKEN_TYPE_INST_INC},
+	{.key = "add", .value = TOKEN_TYPE_INST_ADD},
+	{.key = "inc", .value = TOKEN_TYPE_INST_INC},
 
-	{.key = (void*)"sub", .value = (void*)TOKEN_TYPE_INST_SUB},
-	{.key = (void*)"dec", .value = (void*)TOKEN_TYPE_INST_DEC},
+	{.key = "sub", .value = TOKEN_TYPE_INST_SUB},
+	{.key = "dec", .value = TOKEN_TYPE_INST_DEC},
 
-	{.key = (void*)"mult", .value = (void*)TOKEN_TYPE_INST_MULT},
-	{.key = (void*)"div",  .value = (void*)TOKEN_TYPE_INST_DIV},
-	{.key = (void*)"mod",  .value = (void*)TOKEN_TYPE_INST_MOD},
+	{.key = "mult", .value = TOKEN_TYPE_INST_MULT},
+	{.key = "div",  .value = TOKEN_TYPE_INST_DIV},
+	{.key = "mod",  .value = TOKEN_TYPE_INST_MOD},
 
-	{.key = (void*)"rshift", .value = (void*)TOKEN_TYPE_INST_RSHIFT},
-	{.key = (void*)"lshift", .value = (void*)TOKEN_TYPE_INST_LSHIFT},
+	{.key = "rshift", .value = TOKEN_TYPE_INST_RSHIFT},
+	{.key = "lshift", .value = TOKEN_TYPE_INST_LSHIFT},
 
-	{.key = (void*)"and", .value = (void*)TOKEN_TYPE_INST_AND},
-	{.key = (void*)"or",  .value = (void*)TOKEN_TYPE_INST_OR},
-	{.key = (void*)"not", .value = (void*)TOKEN_TYPE_INST_NOT},
+	{.key = "and", .value = TOKEN_TYPE_INST_AND},
+	{.key = "or",  .value = TOKEN_TYPE_INST_OR},
+	{.key = "not", .value = TOKEN_TYPE_INST_NOT},
 
-	{.key = (void*)"bitand", .value = (void*)TOKEN_TYPE_INST_BITAND},
-	{.key = (void*)"bitor",  .value = (void*)TOKEN_TYPE_INST_BITOR},
+	{.key = "bitand", .value = TOKEN_TYPE_INST_BITAND},
+	{.key = "bitor",  .value = TOKEN_TYPE_INST_BITOR},
 
-	{.key = (void*)"call",  .value = (void*)TOKEN_TYPE_INST_CALL},
-	{.key = (void*)"callt", .value = (void*)TOKEN_TYPE_INST_CALLT},
-	{.key = (void*)"callf", .value = (void*)TOKEN_TYPE_INST_CALLF},
-	{.key = (void*)"ret",   .value = (void*)TOKEN_TYPE_INST_RET},
+	{.key = "call",  .value = TOKEN_TYPE_INST_CALL},
+	{.key = "callt", .value = TOKEN_TYPE_INST_CALLT},
+	{.key = "callf", .value = TOKEN_TYPE_INST_CALLF},
+	{.key = "ret",   .value = TOKEN_TYPE_INST_RET},
 
-	{.key = (void*)"syscall", .value = (void*)TOKEN_TYPE_INST_SYSCALL},
+	{.key = "syscall", .value = TOKEN_TYPE_INST_SYSCALL},
 
-	{.key = (void*)"halt", .value = (void*)TOKEN_TYPE_INST_HALT}
+	{.key = "halt", .value = TOKEN_TYPE_INST_HALT}
 };
 
-pair_t g_regs[] = {
-	{.key = (void*)"R1",  .value = (void*)TOKEN_TYPE_REG_1},
-	{.key = (void*)"R2",  .value = (void*)TOKEN_TYPE_REG_2},
-	{.key = (void*)"R3",  .value = (void*)TOKEN_TYPE_REG_3},
-	{.key = (void*)"R4",  .value = (void*)TOKEN_TYPE_REG_4},
-	{.key = (void*)"R5",  .value = (void*)TOKEN_TYPE_REG_5},
-	{.key = (void*)"R6",  .value = (void*)TOKEN_TYPE_REG_6},
-	{.key = (void*)"R7",  .value = (void*)TOKEN_TYPE_REG_7},
-	{.key = (void*)"R8",  .value = (void*)TOKEN_TYPE_REG_8},
-	{.key = (void*)"R9",  .value = (void*)TOKEN_TYPE_REG_9},
-	{.key = (void*)"R10", .value = (void*)TOKEN_TYPE_REG_10},
-	{.key = (void*)"R11", .value = (void*)TOKEN_TYPE_REG_11},
-	{.key = (void*)"R12", .value = (void*)TOKEN_TYPE_REG_12},
-	{.key = (void*)"R13", .value = (void*)TOKEN_TYPE_REG_13},
-	{.key = (void*)"R14", .value = (void*)TOKEN_TYPE_REG_14},
-	{.key = (void*)"R15", .value = (void*)TOKEN_TYPE_REG_15},
+PAIR_T(keyword) g_regs[] = {
+	{.key = "R1",  .value = TOKEN_TYPE_REG_1},
+	{.key = "R2",  .value = TOKEN_TYPE_REG_2},
+	{.key = "R3",  .value = TOKEN_TYPE_REG_3},
+	{.key = "R4",  .value = TOKEN_TYPE_REG_4},
+	{.key = "R5",  .value = TOKEN_TYPE_REG_5},
+	{.key = "R6",  .value = TOKEN_TYPE_REG_6},
+	{.key = "R7",  .value = TOKEN_TYPE_REG_7},
+	{.key = "R8",  .value = TOKEN_TYPE_REG_8},
+	{.key = "R9",  .value = TOKEN_TYPE_REG_9},
+	{.key = "R10", .value = TOKEN_TYPE_REG_10},
+	{.key = "R11", .value = TOKEN_TYPE_REG_11},
+	{.key = "R12", .value = TOKEN_TYPE_REG_12},
+	{.key = "R13", .value = TOKEN_TYPE_REG_13},
+	{.key = "R14", .value = TOKEN_TYPE_REG_14},
+	{.key = "R15", .value = TOKEN_TYPE_REG_15},
 
-	{.key = (void*)"AC", .value = (void*)TOKEN_TYPE_REG_AC},
-	{.key = (void*)"IP", .value = (void*)TOKEN_TYPE_REG_IP},
-	{.key = (void*)"SP", .value = (void*)TOKEN_TYPE_REG_SP},
-	{.key = (void*)"SB", .value = (void*)TOKEN_TYPE_REG_SB},
-	{.key = (void*)"CN", .value = (void*)TOKEN_TYPE_REG_CN},
-	{.key = (void*)"EX", .value = (void*)TOKEN_TYPE_REG_EX}
+	{.key = "AC", .value = TOKEN_TYPE_REG_AC},
+	{.key = "IP", .value = TOKEN_TYPE_REG_IP},
+	{.key = "SP", .value = TOKEN_TYPE_REG_SP},
+	{.key = "SB", .value = TOKEN_TYPE_REG_SB},
+	{.key = "CN", .value = TOKEN_TYPE_REG_CN},
+	{.key = "EX", .value = TOKEN_TYPE_REG_EX}
 };
 
 lexer_t lexer_new(const char *p_path) {

@@ -1,58 +1,58 @@
 #include "compiler.h"
 
-inst_func_t g_inst_func_map[] = {
-	{.key = TOKEN_TYPE_INST_NONE, .func = compiler_compile_inst_none},
+PAIR_T(inst_func) g_inst_func_map[] = {
+	{.key = TOKEN_TYPE_INST_NONE, .value = compiler_compile_inst_none},
 
-	{.key = TOKEN_TYPE_INST_MOVE, .func = compiler_compile_inst_move},
+	{.key = TOKEN_TYPE_INST_MOVE, .value = compiler_compile_inst_move},
 
-	{.key = TOKEN_TYPE_INST_WRITE, .func = compiler_compile_inst_write},
-	{.key = TOKEN_TYPE_INST_READ,  .func = compiler_compile_inst_read},
+	{.key = TOKEN_TYPE_INST_WRITE, .value = compiler_compile_inst_write},
+	{.key = TOKEN_TYPE_INST_READ,  .value = compiler_compile_inst_read},
 
-	{.key = TOKEN_TYPE_INST_PUSH,   .func = compiler_compile_inst_push},
-	{.key = TOKEN_TYPE_INST_PUSH_A, .func = compiler_compile_inst_pusha},
+	{.key = TOKEN_TYPE_INST_PUSH,   .value = compiler_compile_inst_push},
+	{.key = TOKEN_TYPE_INST_PUSH_A, .value = compiler_compile_inst_pusha},
 
-	{.key = TOKEN_TYPE_INST_POP,   .func = compiler_compile_inst_pop},
-	{.key = TOKEN_TYPE_INST_POP_A, .func = compiler_compile_inst_popa},
+	{.key = TOKEN_TYPE_INST_POP,   .value = compiler_compile_inst_pop},
+	{.key = TOKEN_TYPE_INST_POP_A, .value = compiler_compile_inst_popa},
 
-	{.key = TOKEN_TYPE_INST_EQ,  .func = compiler_compile_inst_eq},
-	{.key = TOKEN_TYPE_INST_NEQ, .func = compiler_compile_inst_neq},
-	{.key = TOKEN_TYPE_INST_GT,  .func = compiler_compile_inst_gt},
-	{.key = TOKEN_TYPE_INST_GE,  .func = compiler_compile_inst_ge},
-	{.key = TOKEN_TYPE_INST_LT,  .func = compiler_compile_inst_lt},
-	{.key = TOKEN_TYPE_INST_LE,  .func = compiler_compile_inst_le},
+	{.key = TOKEN_TYPE_INST_EQ,  .value = compiler_compile_inst_eq},
+	{.key = TOKEN_TYPE_INST_NEQ, .value = compiler_compile_inst_neq},
+	{.key = TOKEN_TYPE_INST_GT,  .value = compiler_compile_inst_gt},
+	{.key = TOKEN_TYPE_INST_GE,  .value = compiler_compile_inst_ge},
+	{.key = TOKEN_TYPE_INST_LT,  .value = compiler_compile_inst_lt},
+	{.key = TOKEN_TYPE_INST_LE,  .value = compiler_compile_inst_le},
 
-	{.key = TOKEN_TYPE_INST_JUMP,  .func = compiler_compile_inst_jump},
-	{.key = TOKEN_TYPE_INST_JUMPT, .func = compiler_compile_inst_jumpt},
-	{.key = TOKEN_TYPE_INST_JUMPF, .func = compiler_compile_inst_jumpf},
+	{.key = TOKEN_TYPE_INST_JUMP,  .value = compiler_compile_inst_jump},
+	{.key = TOKEN_TYPE_INST_JUMPT, .value = compiler_compile_inst_jumpt},
+	{.key = TOKEN_TYPE_INST_JUMPF, .value = compiler_compile_inst_jumpf},
 
-	{.key = TOKEN_TYPE_INST_ADD, .func = compiler_compile_inst_add},
-	{.key = TOKEN_TYPE_INST_INC, .func = compiler_compile_inst_inc},
+	{.key = TOKEN_TYPE_INST_ADD, .value = compiler_compile_inst_add},
+	{.key = TOKEN_TYPE_INST_INC, .value = compiler_compile_inst_inc},
 
-	{.key = TOKEN_TYPE_INST_SUB, .func = compiler_compile_inst_sub},
-	{.key = TOKEN_TYPE_INST_DEC, .func = compiler_compile_inst_dec},
+	{.key = TOKEN_TYPE_INST_SUB, .value = compiler_compile_inst_sub},
+	{.key = TOKEN_TYPE_INST_DEC, .value = compiler_compile_inst_dec},
 
-	{.key = TOKEN_TYPE_INST_MULT, .func = compiler_compile_inst_mult},
-	{.key = TOKEN_TYPE_INST_DIV,  .func = compiler_compile_inst_div},
-	{.key = TOKEN_TYPE_INST_MOD, .func = compiler_compile_inst_mod},
+	{.key = TOKEN_TYPE_INST_MULT, .value = compiler_compile_inst_mult},
+	{.key = TOKEN_TYPE_INST_DIV,  .value = compiler_compile_inst_div},
+	{.key = TOKEN_TYPE_INST_MOD, .value = compiler_compile_inst_mod},
 
-	{.key = TOKEN_TYPE_INST_RSHIFT, .func = compiler_compile_inst_rshift},
-	{.key = TOKEN_TYPE_INST_LSHIFT, .func = compiler_compile_inst_lshift},
+	{.key = TOKEN_TYPE_INST_RSHIFT, .value = compiler_compile_inst_rshift},
+	{.key = TOKEN_TYPE_INST_LSHIFT, .value = compiler_compile_inst_lshift},
 
-	{.key = TOKEN_TYPE_INST_AND, .func = compiler_compile_inst_and},
-	{.key = TOKEN_TYPE_INST_OR,  .func = compiler_compile_inst_or},
-	{.key = TOKEN_TYPE_INST_NOT, .func = compiler_compile_inst_not},
+	{.key = TOKEN_TYPE_INST_AND, .value = compiler_compile_inst_and},
+	{.key = TOKEN_TYPE_INST_OR,  .value = compiler_compile_inst_or},
+	{.key = TOKEN_TYPE_INST_NOT, .value = compiler_compile_inst_not},
 
-	{.key = TOKEN_TYPE_INST_BITAND, .func = compiler_compile_inst_bitand},
-	{.key = TOKEN_TYPE_INST_BITOR,  .func = compiler_compile_inst_bitor},
+	{.key = TOKEN_TYPE_INST_BITAND, .value = compiler_compile_inst_bitand},
+	{.key = TOKEN_TYPE_INST_BITOR,  .value = compiler_compile_inst_bitor},
 
-	{.key = TOKEN_TYPE_INST_CALL,  .func = compiler_compile_inst_call},
-	{.key = TOKEN_TYPE_INST_CALLT, .func = compiler_compile_inst_callt},
-	{.key = TOKEN_TYPE_INST_CALLF, .func = compiler_compile_inst_callf},
-	{.key = TOKEN_TYPE_INST_RET,   .func = compiler_compile_inst_ret},
+	{.key = TOKEN_TYPE_INST_CALL,  .value = compiler_compile_inst_call},
+	{.key = TOKEN_TYPE_INST_CALLT, .value = compiler_compile_inst_callt},
+	{.key = TOKEN_TYPE_INST_CALLF, .value = compiler_compile_inst_callf},
+	{.key = TOKEN_TYPE_INST_RET,   .value = compiler_compile_inst_ret},
 
-	{.key = TOKEN_TYPE_INST_SYSCALL, .func = compiler_compile_inst_syscall},
+	{.key = TOKEN_TYPE_INST_SYSCALL, .value = compiler_compile_inst_syscall},
 
-	{.key = TOKEN_TYPE_INST_HALT, .func = compiler_compile_inst_halt},
+	{.key = TOKEN_TYPE_INST_HALT, .value = compiler_compile_inst_halt},
 };
 
 compiler_t compiler_new(const char *p_path) {
@@ -278,7 +278,7 @@ void compiler_compile_inst(compiler_t *p_compiler) {
 
 	for (size_t i = 0; i < SIZE_OF(g_inst_func_map); ++ i) {
 		if (g_inst_func_map[i].key == p_compiler->node->tok->type) {
-			LIST_PUSH(inst_t, &p_compiler->insts, g_inst_func_map[i].func(p_compiler, argc));
+			LIST_PUSH(inst_t, &p_compiler->insts, g_inst_func_map[i].value(p_compiler, argc));
 
 			return;
 		}

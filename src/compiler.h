@@ -71,12 +71,9 @@ typedef struct {
 	} value;
 } arg_any_t;
 
-typedef struct {
-	token_type_t key;
-	inst_t     (*func)(compiler_t*, size_t);
-} inst_func_t;
+MAKE_PAIR_T_FUNC(inst_func, token_type_t, inst_t, compiler_t*, size_t);
 
-extern inst_func_t g_inst_func_map[];
+extern PAIR_T(inst_func) g_inst_func_map[];
 
 compiler_t compiler_new(const char *p_path);
 

@@ -31,8 +31,10 @@ typedef struct {
 	list_t toks;
 } lexer_t;
 
-extern pair_t g_keywords[];
-extern pair_t g_regs[];
+MAKE_PAIR_T(keyword, const char*, token_type_t);
+
+extern PAIR_T(keyword) g_keywords[];
+extern PAIR_T(keyword) g_regs[];
 
 lexer_t lexer_new(const char *p_path);
 list_t  lexer_lex(lexer_t *p_lexer);
