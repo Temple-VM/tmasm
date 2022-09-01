@@ -18,11 +18,6 @@ bin/%.o: src/%.c $(DEPS)
 ./bin:
 	mkdir -p bin
 
-example:
-	./bin/app ./examples/hello_world.tmasm
-	./bin/app ./examples/loop_to_9.tmasm
-	./bin/app ./examples/int_to_str.tmasm
-
 install:
 	cp ./bin/app /usr/bin/tmasm
 
@@ -30,4 +25,4 @@ clean:
 	rm -r ./bin/*
 
 all:
-	@echo compile, example, install, clean
+	@echo compile, install, clean
